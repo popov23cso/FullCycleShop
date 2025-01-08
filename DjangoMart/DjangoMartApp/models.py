@@ -13,4 +13,6 @@ class User(AbstractUser):
     represented_company_name = models.CharField(max_length=100, null=False)
     verified_representative = models.BooleanField(default=False)
     purchased_machines = models.IntegerField(default=0)
+    is_deleted = models.BooleanField(default=False)
+    last_modified_date = models.DateTimeField(auto_now_add=True)
 
