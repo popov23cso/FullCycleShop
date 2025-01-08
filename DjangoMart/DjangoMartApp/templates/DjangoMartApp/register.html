@@ -1,0 +1,53 @@
+{% extends 'DjangoMartApp/layout.html' %}
+
+{% block title %}
+    Register
+{% endblock %}
+
+
+{% block body %}
+<div class="container text-left mt-5">
+    <div class="row mb-5">
+        <div class="col-md-4">
+            <form action="{% url 'register' %}" method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                <label for="emailAddress" class="form-label">Email address</label>
+                <input type="email" class="form-control" id="emailAddress" name="email" required>
+                <div id="emailHelp" class="form-text text-light">
+                    We'll never share your email with anyone else.</div>
+                </div>
+                <div class="mb-3">
+                <label for="firstName" class="form-label">First Name</label>
+                <input type="text" id="firstName" class="form-control mb-3" name="firstName" required autocomplete="off">
+                <label for="middleName" class="form-label">Middle Name</label>
+                <input type="text" id="middleName" class="form-control mb-3" name="middleName" required autocomplete="off">
+                <label for="lastName" class="form-label">Last Name</label>
+                <input type="text" id="lastName" class="form-control mb-3" name="lastName" required autocomplete="off">
+                <label for="phoneNumber" class="form-label">Phone Number</label>
+                <input type="text" id="phoneNumber" class="form-control mb-3" name="phoneNumber" required autocomplete="off">
+                <label for="companyName" class="form-label">Represented Company Name</label>
+                <input type="text" id="companyName" class="form-control mb-3" name="representedCompanyName" required autocomplete="off">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" id="password" class="form-control mb-3" name="password" required autocomplete="off">
+                <label for="repeatedPassword" class="form-label">Repeat Password</label>
+                <input type="password" id="repeatedPassword" class="form-control" name="repeatedPassword" required autocomplete="off">
+                </div>
+                <button type="submit" class="btn btn-primary">Register</button>
+                <div id="registerHelp" class="form-text text-light">
+                    We'll reach out to you to confirm the validity of your account and activate it</div>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-2 mt-3 mb-3">
+        </div>
+        <div class="col-md-4">
+            {% if error %}
+            <div class="alert alert-danger" role="alert">
+                {{error}}
+            </div>              
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

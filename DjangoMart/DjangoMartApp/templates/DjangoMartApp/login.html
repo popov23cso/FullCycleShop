@@ -1,0 +1,37 @@
+{% extends 'DjangoMartApp/layout.html' %}
+
+{% block title %}
+    Log In 
+{% endblock %}
+
+
+{% block body %}
+<div class="container text-left mt-5">
+    <div class="row">
+        <div class="col-md-4">
+            <form action="{% url 'login_view' %}" method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email address</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Log In</button>
+            </form>
+        </div>
+        <div class="col-md-2 mt-3 mb-3">
+        </div>
+        <div class="col-md-4">
+            <div class="mb-5">
+                By registering you will gain access to our amazing PC offers for your business 
+            </div>
+            <a href="{% url 'register' %}">
+                <button type="button" class="btn btn-primary">Register</button>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
