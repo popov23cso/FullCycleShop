@@ -1,0 +1,8 @@
+{
+    "tables": [
+        {
+            "name": "DjangoMartApp_user",
+            "last_ingestion_dtt": "0"
+        }
+    ]
+}
