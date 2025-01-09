@@ -1,8 +1,9 @@
 {
+    "database_name": "db.sqlite3",
     "tables": [
         {
             "name": "DjangoMartApp_user",
-            "last_ingestion_dtt": "0"
+            "last_ingestion_dtt": "2025-01-09 11:20:09.227018"
         }
     ]
 }

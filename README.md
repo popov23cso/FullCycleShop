@@ -1,4 +1,4 @@
 # FullCycleShop
 
 # Required python modules
-django, pandas
+django, pandas, pyarrow
