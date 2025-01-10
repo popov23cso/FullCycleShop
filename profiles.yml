@@ -1,0 +1,12 @@
+# Edit to match file paths on your system and place in the .dbt folder
+DjangoMartDBT:
+  outputs:
+    dev:
+      type: sqlite
+      threads: 1
+      database: 'DjangoMartDWH'
+      schema: 'main'
+      schemas_and_paths:
+        main: '<file_path>/DjangoMartDWH_main.db'
+      schema_directory: '<file_path>/DjangoMartDWH'
+  target: dev
