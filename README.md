@@ -1,4 +1,4 @@
 # FullCycleShop
 
 # Required python modules
-django, pandas, pyarrow
+django, pandas, pyarrow, dbt-core, dbt-sqlite

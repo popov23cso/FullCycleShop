@@ -1,0 +1,43 @@
+[0m10:17:32.293440 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001D3CECAA120>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001D3CEA3C6E0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001D3CECAA210>]}
+
+
+============================== 10:17:32.293440 | 6dcb98e0-34ca-4239-9605-e7f9408f57c6 ==============================
+[0m10:17:32.293440 [info ] [MainThread]: Running with dbt=1.5.11
+[0m10:17:32.308952 [debug] [MainThread]: running dbt with arguments {'printer_width': '80', 'indirect_selection': 'eager', 'write_json': 'True', 'log_cache_events': 'False', 'partial_parse': 'True', 'cache_selected_only': 'False', 'profiles_dir': 'C:\\Users\\petko\\.dbt', 'fail_fast': 'False', 'debug': 'False', 'log_path': 'logs', 'version_check': 'True', 'warn_error': 'None', 'use_colors': 'True', 'use_experimental_parser': 'False', 'no_print': 'None', 'quiet': 'False', 'log_format': 'default', 'introspect': 'True', 'warn_error_options': 'WarnErrorOptions(include=[], exclude=[])', 'static_parser': 'True', 'target_path': 'None', 'send_anonymous_usage_stats': 'True'}
+[0m10:17:32.308952 [warn ] [MainThread]: [ConfigFolderDirectory]: Unable to parse dict {'dir': WindowsPath('C:/Users/petko/.dbt')}
+[0m10:17:32.308952 [info ] [MainThread]: Creating dbt configuration folder at 
+[0m10:17:45.900181 [debug] [MainThread]: Starter project path: C:\Users\petko\AppData\Local\Programs\Python\Python312\Lib\site-packages\dbt\include\starter_project
+[0m10:17:51.269719 [info ] [MainThread]: Profile DjangoMartDBT written to C:\Users\petko\.dbt\profiles.yml using target's sample configuration. Once updated, you'll be able to start developing with dbt.
+[0m10:17:51.269719 [info ] [MainThread]: 
+Your new dbt project "DjangoMartDBT" was created!
+
+For more information on how to configure the profiles.yml file,
+please consult the dbt documentation here:
+
+  https://docs.getdbt.com/docs/configure-your-profile
+
+One more thing:
+
+Need help? Don't hesitate to reach out to us via GitHub issues or on Slack:
+
+  https://community.getdbt.com/
+
+Happy modeling!
+
+[0m10:17:51.274566 [debug] [MainThread]: Command `dbt init` succeeded at 10:17:51.274566 after 19.06 seconds
+[0m10:17:51.274940 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001D3CE3CB920>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001D3CEB041A0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001D3CE9E4170>]}
+[0m10:17:51.274940 [debug] [MainThread]: Flushing usage events
+[0m10:35:59.748539 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000194F4F06C90>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000194F4DDEED0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000194F4E28080>]}
+
+
+============================== 10:35:59.748539 | d9742ec7-5cca-4654-90e9-1c8f355569a9 ==============================
+[0m10:35:59.748539 [info ] [MainThread]: Running with dbt=1.5.11
+[0m10:35:59.748539 [debug] [MainThread]: running dbt with arguments {'printer_width': '80', 'indirect_selection': 'eager', 'write_json': 'True', 'log_cache_events': 'False', 'partial_parse': 'True', 'cache_selected_only': 'False', 'warn_error': 'None', 'fail_fast': 'False', 'version_check': 'True', 'log_path': 'logs', 'profiles_dir': 'C:\\Users\\petko\\.dbt', 'debug': 'False', 'use_colors': 'True', 'use_experimental_parser': 'False', 'no_print': 'None', 'quiet': 'False', 'warn_error_options': 'WarnErrorOptions(include=[], exclude=[])', 'static_parser': 'True', 'log_format': 'default', 'introspect': 'True', 'target_path': 'None', 'send_anonymous_usage_stats': 'True'}
+[0m10:35:59.748539 [error] [MainThread]: Encountered an error:
+Runtime Error
+  No dbt_project.yml found at expected path C:\Users\petko\OneDrive\Работен плот\projects git\FullCycleShop\dbtproject\dbt_project.yml
+  Verify that each entry within packages.yml (and their transitive dependencies) contains a file named dbt_project.yml
+  
+[0m10:35:59.748539 [debug] [MainThread]: Command `dbt run` failed at 10:35:59.748539 after 0.14 seconds
+[0m10:35:59.748539 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000194F4CE3EC0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000194F4E28080>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000194F4F07020>]}
+[0m10:35:59.748539 [debug] [MainThread]: Flushing usage events
