@@ -34,10 +34,10 @@ def ingest_sqlite3_data(metadata_file_name):
 def ingest_sqlite3_table(table, db_connection, ingestion_start_dtt):
     query = f"SELECT * FROM {table['name']} WHERE last_modified_date > '{table['last_ingestion_dtt']}'"
     df = pd.read_sql_query(query, db_connection)
-
-    file_name = table['name'] + '_' + ingestion_start_dtt.strftime('%Y%m%d%H%M%S') + '.parquet'
-    
-    file_path = Path(__file__).resolve().parent.parent.parent / 'DataLake' / 'SQLite3' / table['name'] / file_name
-    df.to_parquet(file_path, engine='pyarrow', index=False)
+    if len(df) > 0:
+        file_name = table['name'] + '_' + ingestion_start_dtt.strftime('%Y%m%d%H%M%S') + '.parquet'
+        
+        file_path = Path(__file__).resolve().parent.parent.parent / 'DataLake' / 'SQLite3' / table['name'] / file_name
+        df.to_parquet(file_path, engine='pyarrow', index=False)
 
 ingest_sqlite3_data('tables.json')
