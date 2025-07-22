@@ -16,8 +16,12 @@ class User(AbstractUser):
     created_date = models.DateTimeField(default=timezone.now, editable=False)
     updated_date = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return f'{self.first_name} {self.last_name} {self.email}'
+
 class Category(models.Model):
     title = models.CharField(max_length=100)
+    slug = models.SlugField(unique=True)
     description = models.TextField(max_length=2000)
     is_main_category = models.BooleanField(default=False)
     parent_category = models.ForeignKey(
@@ -36,9 +40,15 @@ class Category(models.Model):
             raise ValueError("Main categories shouldn't have a parent.")
         super().save(*args, **kwargs)
 
+    def __str__(self):
+        return f'{self.title}'
+
 class Brand(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField(max_length=2000)
+
+    def __str__(self):
+        return f'{self.title}'
 
 class Product(models.Model):
     title = models.CharField(max_length=100)
@@ -48,6 +58,7 @@ class Product(models.Model):
     stock = models.IntegerField(validators=[MinValueValidator(1)])
     rating = models.FloatField(blank=True, null=True)
     rating_count = models.IntegerField(default=0)
+    sales_count = models.IntegerField(default=0)
     categories = models.ManyToManyField(Category)
     product_weight = models.CharField(max_length=50, blank=True, null=True)
     product_height = models.CharField(max_length=50, blank=True, null=True)
@@ -60,6 +71,9 @@ class Product(models.Model):
     warranty = models.IntegerField(blank=True, null=True)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'{self.title}'
 
 class ShoppingCart(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
