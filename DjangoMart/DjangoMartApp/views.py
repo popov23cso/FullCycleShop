@@ -1,12 +1,18 @@
-from django.shortcuts import render, redirect
-from .models import User
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import User, Category, Product
 from django.db import IntegrityError
 from django.contrib.auth import authenticate, login, logout
+from .functions import render_django_mart_app
 
 # Create your views here.
 def homepage(request):
-    return render(request, 'DjangoMartApp/homepage.html')
+    return render_django_mart_app(request, 'homepage')
 
+def category_view(request, category_slug):
+    category = get_object_or_404(Category, slug=category_slug)
+    top_products = Product.objects.filter(categories=category).order_by('-sales_count')[:20]
+
+    return render_django_mart_app(request, 'category', {'top_products':top_products})
 
 def login_view(request):
     if request.method == 'POST':
@@ -16,13 +22,11 @@ def login_view(request):
         if user.check_password(password):
             login(request, user)
         else:
-            return render(request, 'DjangoMartApp/login.html', {
-                'error': 'Incorrect password!'
-            })
+            return render_django_mart_app(request, 'login', {'error': 'Incorrect password!'})
         return redirect('homepage')
 
     else:
-        return render(request, 'DjangoMartApp/login.html')
+        return render_django_mart_app(request, 'login')
 
 def register(request):
     if request.method == 'POST':
@@ -37,9 +41,7 @@ def register(request):
         password_repeated = request.POST['repeatedPassword']
 
         if password != password_repeated:
-            return render(request, 'DjangoMartApp/register.html', {
-                'error': 'Passwords must match!'
-            })
+            return render_django_mart_app(request, 'register', {'error': 'Passwords must match!'})
         
         try:
             user = User.objects.create(
@@ -54,13 +56,11 @@ def register(request):
             user.save()
             login(request, user)
         except IntegrityError:
-            return render(request, 'pfitness/register.html', {
-                'error': 'Email already taken!'
-            })
+            return  render_django_mart_app(request, 'register', {'error': 'Email already taken!'})
         return redirect('homepage')
 
     else:
-        return render(request, 'DjangoMartApp/register.html')
+        return render_django_mart_app(request, 'register')
     
 def logout_view(request):
     logout(request)
