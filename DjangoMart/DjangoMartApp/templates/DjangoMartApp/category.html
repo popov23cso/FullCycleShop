@@ -1,0 +1,22 @@
+{% extends "DjangoMartApp/layout.html" %}
+
+{% block title %}
+    {{category}}
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="container">
+        <div class="row">
+            <div class="col-1">
+                Categories
+            </div>
+            <div class="col">
+                {% for product in top_products %}
+                    {{ product }}
+                {% endfor %}
+            </div>
+        </div>
+        </div>
+    </div>
+{% endblock %}

@@ -2,3 +2,8 @@ body {
     background-color:rgb(21, 32, 43);
     color: white;
 }
+
+#dark-element {
+    border-color: rgb(21, 32, 43) !important;
+    color: rgb(21, 32, 43) !important;
+}
