@@ -55,7 +55,7 @@ class Product(models.Model):
     description = models.TextField(max_length=2000)
     price = models.FloatField(validators=[MinValueValidator(1.0)])
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
-    stock = models.IntegerField(validators=[MinValueValidator(1)])
+    stock = models.PositiveIntegerField(validators=[MinValueValidator(1)])
     rating = models.FloatField(blank=True, null=True)
     rating_count = models.IntegerField(default=0)
     sales_count = models.IntegerField(default=0)
@@ -68,7 +68,7 @@ class Product(models.Model):
     package_height = models.CharField(max_length=50, blank=True, null=True)
     package_width = models.CharField(max_length=50, blank=True, null=True)
     package_length = models.CharField(max_length=50, blank=True, null=True)
-    warranty = models.IntegerField(blank=True, null=True)
+    warranty = models.PositiveIntegerField(blank=True, null=True)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
 
@@ -79,10 +79,23 @@ class ShoppingCart(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
 
 class CartItem(models.Model):
-    cart = models.ForeignKey(ShoppingCart, on_delete=models.CASCADE)
+    cart = models.ForeignKey(ShoppingCart, on_delete=models.CASCADE, related_name='cart_items')
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
 
+class Purchase(models.Model):
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    total_price = models.FloatField()
+    is_invalid = models.BooleanField(default=False)
+    created_date = models.DateTimeField(auto_now_add=True)
+
+class PurchaseItem(models.Model):
+    purchase = models.ForeignKey(Purchase, on_delete=models.DO_NOTHING, related_name='purchase_items')
+    product_name = models.CharField(max_length=100)
+    product_id = models.CharField(max_length=200)
+    price_at_purchase = models.FloatField()
+    quantity = models.PositiveIntegerField()
+    created_date = models.DateTimeField(auto_now_add=True)
 
 
 
