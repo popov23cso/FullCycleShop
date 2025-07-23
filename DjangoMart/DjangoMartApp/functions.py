@@ -14,6 +14,12 @@ def add_product_to_cart(cart, product, qty=1):
         cart_item.refresh_from_db()
     return cart_item
 
+def product_has_enough_stock(product_id, quantity):
+    product = Product.objects.get(id=product_id)
+    if quantity <= product.stock:
+        return True 
+    return False
+
 
 def render_django_mart_app(request, template_name, context=None):
     if context is None:
