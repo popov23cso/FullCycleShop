@@ -1,8 +1,11 @@
+from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import User, Category, Product
+from .models import User, Category, Product, ShoppingCart, CartItem
 from django.db import IntegrityError
 from django.contrib.auth import authenticate, login, logout
 from .functions import render_django_mart_app
+from django.core.exceptions import ObjectDoesNotExist
+from markdown import markdown
 
 # Create your views here.
 def homepage(request):
@@ -10,19 +13,37 @@ def homepage(request):
 
 def category_view(request, category_slug):
     category = get_object_or_404(Category, slug=category_slug)
-    top_products = Product.objects.filter(categories=category).order_by('-sales_count')[:20]
+    products = Paginator(Product.objects.filter(categories=category).order_by('-sales_count'), 20)
+    page_number = request.GET.get('page')
+    products_page = products.get_page(page_number)
+    return render_django_mart_app(request, 'category', {'products':products_page})
 
-    return render_django_mart_app(request, 'category', {'top_products':top_products})
+def product_view(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    product.description_html = markdown(product.description)
+    return render_django_mart_app(request, 'product', {'product':product})
+
+
+def cart_view(request):
+    cart, created = ShoppingCart.objects.get_or_create(user_id=request.user)
+    cart_items = None
+    if not created:
+        cart_items = cart.cart_items.select_related('product')
+
+    return render_django_mart_app(request, 'cart', {'cart_items': cart_items})
 
 def login_view(request):
     if request.method == 'POST':
         email = request.POST['email']
-        user = User.objects.get(username=email)
+        try:
+            user = User.objects.get(username=email)
+        except User.DoesNotExist:
+            return render_django_mart_app(request, 'login', {'error': 'Invalid username or password'})
         password = request.POST['password']
         if user.check_password(password):
             login(request, user)
         else:
-            return render_django_mart_app(request, 'login', {'error': 'Incorrect password!'})
+            return render_django_mart_app(request, 'login', {'error': 'Invalid username or password'})
         return redirect('homepage')
 
     else:
