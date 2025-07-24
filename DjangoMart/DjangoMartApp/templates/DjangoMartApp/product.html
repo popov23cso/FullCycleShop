@@ -1,5 +1,7 @@
 {% extends "DjangoMartApp/layout.html" %}
 
+{% load static %}
+
 {% block title %}
     {{product.title}}
 {% endblock %}
@@ -25,9 +27,22 @@
             </div>
             <div class="col-1">
                 <button type="button" class="btn btn-outline-light" id="addToCartBtn">Add to cart</button>
+                <label for="quantity" class="form-label">Quantity</label>
+                <input type="number" class="form-control" id="quantity" name="quantity" value="1" min="1">
+                <div class="toast-container position-fixed bottom-0 end-0 p-3">
+                    <div id="liveToast" class="toast text-bg-success" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="toast-header">
+                            <strong class="me-auto" id="toastMessage"></strong>
+                            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                        <div class="toast-body" id="toastBody">
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+    <input type="hidden" id="productId" value="{{ product.id }}">
 {% endblock %}
 
 {% block scripts %}
