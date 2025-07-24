@@ -77,6 +77,10 @@ class Product(models.Model):
 
 class ShoppingCart(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    total_items_count = models.PositiveIntegerField(default=0)
+    def total_value(self):
+        cart_items = self.cart_items.select_related('product')
+        return sum(item.quantity * item.product.price for item in cart_items)
 
 class CartItem(models.Model):
     cart = models.ForeignKey(ShoppingCart, on_delete=models.CASCADE, related_name='cart_items')
