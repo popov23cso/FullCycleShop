@@ -1,0 +1,50 @@
+{% extends "DjangoMartApp/layout.html" %}
+
+{% load static %}
+
+{% block title %}
+    {{product.title}}
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h2>{{product.title}}</h2>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <svg aria-label="Placeholder: Image cap" class="bd-placeholder-img card-img-top" height="180" preserveAspectRatio="xMidYMid slice" role="img" width="100%" xmlns="http://www.w3.org/2000/svg">
+                    <title>Placeholder</title>
+                    <rect width="100%" height="100%" fill="#868e96">
+                    </rect>
+                    <text x="40%" y="50%" fill="#dee2e6" dy=".3em">
+                        Image cap
+                    </text>
+                </svg>
+            </div>
+            <div class="col">
+                {{product.description_html|safe}}
+            </div>
+            <div class="col-1">
+                <button type="button" class="btn btn-outline-light" id="addToCartBtn">Add to cart</button>
+                <label for="quantity" class="form-label">Quantity</label>
+                <input type="number" class="form-control" id="quantity" name="quantity" value="1" min="1">
+                <div class="toast-container position-fixed bottom-0 end-0 p-3">
+                    <div id="liveToast" class="toast text-bg-success" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="toast-header">
+                            <strong class="me-auto" id="toastMessage"></strong>
+                            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                        <div class="toast-body" id="toastBody">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" id="productId" value="{{ product.id }}">
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'DjangoMartApp/product.js' %}"></script>
+{% endblock %}
