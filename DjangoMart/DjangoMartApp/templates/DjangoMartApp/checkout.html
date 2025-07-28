@@ -1,0 +1,53 @@
+{% extends 'DjangoMartApp/layout.html' %}
+
+{% block title %}
+    Checkout
+{% endblock %}
+
+
+{% block body %}
+<div class="row mt-3">
+    <div class="col">
+        {% if delivery_destinations %}
+            {% for destination in delivery_destinations %}
+                <div class="card" style="width: 18rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <span id="city">{{delivery.city}}</span> - <span id="street">{{delivery.street}}</span> <span id="streetNum">{{delivery.street_number}}</span>
+                        </h5>
+                        <p class="card-text">Phone: <span id="phoneNum">{{delivery.phone_number}}</span></p>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="dropdown">
+            <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+                Add ann address
+            </button>
+            <form class="dropdown-menu p-4">
+                <div class="mb-3">
+                <label for="exampleDropdownFormEmail2" class="form-label">Email address</label>
+                <input type="email" class="form-control" id="exampleDropdownFormEmail2" placeholder="email@example.com">
+                </div>
+                <div class="mb-3">
+                <label for="exampleDropdownFormPassword2" class="form-label">Password</label>
+                <input type="password" class="form-control" id="exampleDropdownFormPassword2" placeholder="Password">
+                </div>
+                <div class="mb-3">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="dropdownCheck2">
+                    <label class="form-check-label" for="dropdownCheck2">
+                    Remember me
+                    </label>
+                </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Save address</button>
+            </form>
+            </div>
+        {% endif %}
+    </div>
+    <div class="col">
+        total + checkout button 
+    </div>
+</div>
+{% endblock %}

@@ -1,6 +1,6 @@
+from .models import User, Category, Product, ShoppingCart, CartItem, DeliveryDestination
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import User, Category, Product, ShoppingCart, CartItem
 from django.db import IntegrityError
 from django.contrib.auth import authenticate, login, logout
 from .functions import render_django_mart_app, product_has_enough_stock, add_product_to_cart
@@ -17,7 +17,7 @@ def homepage_view(request):
 
 def category_view(request, category_slug):
     category = get_object_or_404(Category, slug=category_slug)
-    products = Paginator(Product.objects.filter(categories=category).order_by('-sales_count'), 20)
+    products = Paginator(Product.objects.filter(categories=category, is_active=True).order_by('-sales_count'), 20)
     page_number = request.GET.get('page')
     products_page = products.get_page(page_number)
     return render_django_mart_app(request, 'category', {'products':products_page})
@@ -86,6 +86,21 @@ def cart_view(request):
     return render_django_mart_app(request, 'cart', {
         'cart_items': cart_items,
         'total_cart_value':total_cart_value})
+
+@login_required
+def checkout(request):
+    if request.method == 'GET':
+        delivery_destinations = DeliveryDestination.objects.filter(user=request.user)
+        available_tokens = request.user.available_tokens
+        cart = ShoppingCart.objects.get(user_id=request.user)
+        cart_total_token_cost = cart.total_value()
+        print(delivery_destinations)
+        return render_django_mart_app(request, 'checkout', {
+            'available_tokens': available_tokens,
+            'cart_total_token_cost': cart_total_token_cost,
+            'delivery_destinations': delivery_destinations
+        })
+
 
 def login_view(request):
     if request.method == 'POST':

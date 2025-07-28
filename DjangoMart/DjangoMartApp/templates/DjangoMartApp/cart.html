@@ -41,9 +41,12 @@
         {% endfor %}
     </div>
     <div class="container">
-        <div class="alert alert-success" role="alert">
+        <div class="alert alert-success mb-3" role="alert">
             TOTAL: {{total_cart_value}} tokens
         </div>
+        <a href="{% url 'checkout' %}">
+            <button type="button" class="btn btn-outline-success">Go to checkout</button>
+        </a>
     </div>
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
         <div id="liveToast" class="toast text-bg-success" role="alert" aria-live="assertive" aria-atomic="true">
@@ -59,5 +62,5 @@
 
 
 {% block scripts %}
-    <script src="{% static 'DjangoMartApp/cart.js' %}"></script>
+    <script type="module" src="{% static 'DjangoMartApp/cart.js' %}"></script>
 {% endblock %}
