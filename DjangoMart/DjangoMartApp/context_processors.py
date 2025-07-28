@@ -2,7 +2,7 @@ from .models import Category, ShoppingCart
 
 def categories_processor(request):
     return {
-        'categories': Category.objects.all()
+        'categories': Category.objects.filter(is_active=True)
     }
 
 
