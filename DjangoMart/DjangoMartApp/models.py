@@ -2,7 +2,7 @@ from django.db import models
 from django.utils import timezone
 
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 # Create your models here.
 
@@ -12,13 +12,45 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=50)
     phone_number = models.CharField(max_length=15, blank=True)
     total_purchased_amount = models.FloatField(default=0)
+    available_tokens = models.FloatField(default=500)
+    delivery_details_provided_count = models.PositiveSmallIntegerField(default=0, validators=[MaxValueValidator(3)])
     is_deleted = models.BooleanField(default=False)
     created_date = models.DateTimeField(default=timezone.now, editable=False)
     updated_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f'{self.first_name} {self.last_name} {self.email}'
+    
+class DeliveryDestination(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    city = models.CharField(max_length=100)
+    street = models.CharField(max_length=100)
+    street_number = models.PositiveIntegerField(blank=True, null=True)
+    phone_number = models.PositiveIntegerField()
 
+class DeliveryTracking(models.Model):
+    class Status(models.TextChoices):
+        COLLECTING = 'Collecting'
+        PREPARED = 'Prepared'
+        SHIPPED = 'Shipped'
+        DELIVERED = 'Delivered'
+        CANCELLED = 'Cancelled'
+
+    delivery_destination = models.ForeignKey(DeliveryDestination, on_delete=models.DO_NOTHING)
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    city = models.CharField(max_length=100)
+    street = models.CharField(max_length=100)
+    street_number = models.PositiveIntegerField(blank=True, null=True)
+    phone_number = models.PositiveIntegerField()
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.COLLECTING,
+    )
+    purchase = models.ForeignKey('Purchase', on_delete=models.CASCADE)
+    created_date = models.DateTimeField(auto_now_add=True)
+    delivered_date = models.DateTimeField(blank=True, null=True)
+    
 class Category(models.Model):
     title = models.CharField(max_length=100)
     slug = models.SlugField(unique=True)
@@ -33,6 +65,7 @@ class Category(models.Model):
     )
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
 
     # validate that a parent category does not have a parent itself
     def save(self, *args, **kwargs):
@@ -73,6 +106,7 @@ class Product(models.Model):
     warranty = models.PositiveIntegerField(blank=True, null=True)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return f'{self.title}'
