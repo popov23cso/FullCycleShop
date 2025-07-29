@@ -1,5 +1,7 @@
 {% extends 'DjangoMartApp/layout.html' %}
 
+{% load static %}
+
 {% block title %}
     Checkout
 {% endblock %}
@@ -21,28 +23,30 @@
             {% endfor %}
         {% else %}
             <div class="dropdown">
-            <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
-                Add ann address
-            </button>
-            <form class="dropdown-menu p-4">
-                <div class="mb-3">
-                <label for="exampleDropdownFormEmail2" class="form-label">Email address</label>
-                <input type="email" class="form-control" id="exampleDropdownFormEmail2" placeholder="email@example.com">
-                </div>
-                <div class="mb-3">
-                <label for="exampleDropdownFormPassword2" class="form-label">Password</label>
-                <input type="password" class="form-control" id="exampleDropdownFormPassword2" placeholder="Password">
-                </div>
-                <div class="mb-3">
-                <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="dropdownCheck2">
-                    <label class="form-check-label" for="dropdownCheck2">
-                    Remember me
-                    </label>
-                </div>
-                </div>
-                <button type="submit" class="btn btn-primary">Save address</button>
-            </form>
+                <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+                    Add an address
+                </button>
+                <form class="dropdown-menu p-4">
+                    <div class="mb-3">
+                        <label for="dropdownCity" class="form-label">City</label>
+                        <input class="form-control" id="dropdownCity">
+                    </div>
+                    <div class="mb-3">
+                        <label for="dropdownStreet" class="form-label">Street</label>
+                        <input class="form-control" id="dropdownStreet" >
+                    </div>
+                    <div class="mb-3">
+                        <label for="dropdownStreetNumber" class="form-label">Street Number</label>
+                        <input class="form-control" id="dropdownStreetNumber" >
+                    </div>
+                    <div class="mb-3">
+                        <label for="dropdownPhoneNumber" class="form-label">Phone Number</label>
+                        <input class="form-control" id="dropdownPhoneNumber" >
+                    </div>
+                    <div class="mb-3">
+                        <button type="button" class="btn btn-primary" id="saveAddressBtn" >Save address</button>
+                    </div>
+                </form>
             </div>
         {% endif %}
     </div>
@@ -50,4 +54,18 @@
         total + checkout button 
     </div>
 </div>
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="liveToast" class="toast text-bg-success" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <strong class="me-auto" id="toastMessage"></strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body" id="toastBody">
+            </div>
+        </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    <script type="module" src="{% static 'DjangoMartApp/checkout.js' %}"></script>
 {% endblock %}
