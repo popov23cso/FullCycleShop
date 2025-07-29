@@ -9,6 +9,7 @@ from markdown import markdown
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse
+from django.forms.models import model_to_dict
 import json 
 
 # Create your views here.
@@ -28,7 +29,7 @@ def product_view(request, product_id):
     return render_django_mart_app(request, 'product', {'product':product})
 
 @login_required
-@require_http_methods(["PUT"])
+@require_http_methods(['PUT'])
 def add_to_cart(request):
     try:
         request_body = json.loads(request.body)
@@ -51,11 +52,14 @@ def add_to_cart(request):
         return JsonResponse({'error': 'Invalid JSON format'}, status=400)
     
 @login_required
-@require_http_methods(["PUT"])
+@require_http_methods(['PUT'])
 def remove_from_cart(request):
     try:
         request_body = json.loads(request.body)
         item_id = request_body.get('cart_item_id')
+        
+        if not item_id:
+            return JsonResponse({'error': 'Item id not provided'}, status=400)
         
         cart_item = CartItem.objects.get(id=item_id)
         cart = ShoppingCart.objects.get(user_id=request.user)
@@ -94,12 +98,45 @@ def checkout(request):
         available_tokens = request.user.available_tokens
         cart = ShoppingCart.objects.get(user_id=request.user)
         cart_total_token_cost = cart.total_value()
-        print(delivery_destinations)
+
         return render_django_mart_app(request, 'checkout', {
             'available_tokens': available_tokens,
             'cart_total_token_cost': cart_total_token_cost,
             'delivery_destinations': delivery_destinations
         })
+    
+@login_required
+@require_http_methods(['PUT'])
+def add_address(request):
+
+    if request.user.delivery_details_provided_count == 3:
+        return JsonResponse({'error': 'You cannot have more than 3 addresses saved'}, status=400)
+    
+    request_body = json.loads(request.body)
+    city = request_body.get('city')
+    street = request_body.get('street')
+    street_number = request_body.get('street_number')
+    phone_number = request_body.get('phone_number')
+
+    if not city or not street or not street_number or not phone_number:
+        return JsonResponse({'error': 'Mandatory field not provided'}, status=400)
+    
+    delivery_destination = DeliveryDestination.objects.create(
+        user=request.user,
+        city=city,
+        street=street,
+        street_number=street_number,
+        phone_number=phone_number
+    )
+
+    return JsonResponse(model_to_dict(delivery_destination, fields=[
+        'city',
+        'street',
+        'street_number',
+        'phone_number'])
+        , status=200)
+
+
 
 
 def login_view(request):
