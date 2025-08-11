@@ -98,11 +98,13 @@ def checkout(request):
         available_tokens = request.user.available_tokens
         cart = ShoppingCart.objects.get(user_id=request.user)
         cart_total_token_cost = cart.total_value()
+        delivery_details_provided_count = request.user.delivery_details_provided_count
 
         return render_django_mart_app(request, 'checkout', {
             'available_tokens': available_tokens,
             'cart_total_token_cost': cart_total_token_cost,
-            'delivery_destinations': delivery_destinations
+            'delivery_destinations': delivery_destinations,
+            'delivery_details_provided_count': delivery_details_provided_count
         })
     
 @login_required
@@ -129,12 +131,42 @@ def add_address(request):
         phone_number=phone_number
     )
 
+    request.user.delivery_details_provided_count += 1
+    request.user.save()
+
     return JsonResponse(model_to_dict(delivery_destination, fields=[
         'city',
         'street',
         'street_number',
         'phone_number'])
         , status=200)
+
+@login_required
+@require_http_methods(['PUT'])
+def remove_address(request):
+    request_body = json.loads(request.body)
+    city = request_body.get('city')
+    street = request_body.get('street')
+    street_number = request_body.get('street_number')
+    phone_number = request_body.get('phone_number')
+    print(city, street, street_number, phone_number)
+    try:
+        delivery_destination = DeliveryDestination.objects.get(
+        user=request.user,
+        city=city,
+        street=street,
+        street_number=street_number,
+        phone_number=phone_number
+    )
+    except DeliveryDestination.DoesNotExist:
+        return JsonResponse({'error': 'No such delivery address exists for this user'}, status=404)
+    
+    delivery_destination.delete()
+    request.user.delivery_details_provided_count -= 1
+    request.user.save()
+
+    return JsonResponse({'message': 'Address deleted successfully'}, status=200)
+
 
 
 
@@ -144,7 +176,7 @@ def login_view(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
         if not email or not password:
-            return render_django_mart_app(request, 'login', {'error': 'Please input both email and password'})
+            return render_django_mart_app(request, 'login', {'message': 'Please input both email and password'})
         try:
             user = User.objects.get(username=email)
             if user.check_password(password):
@@ -153,7 +185,7 @@ def login_view(request):
         except User.DoesNotExist:
             pass
 
-        return render_django_mart_app(request, 'login', {'error': 'Invalid username or password'})
+        return render_django_mart_app(request, 'login', {'message': 'Invalid username or password'})
 
     else:
         return render_django_mart_app(request, 'login')
