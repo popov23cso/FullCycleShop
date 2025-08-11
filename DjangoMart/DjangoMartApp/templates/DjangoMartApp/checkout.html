@@ -10,45 +10,57 @@
 {% block body %}
 <div class="row mt-3">
     <div class="col">
-        {% if delivery_destinations %}
-            {% for destination in delivery_destinations %}
-                <div class="card" style="width: 18rem;">
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            <span id="city">{{delivery.city}}</span> - <span id="street">{{delivery.street}}</span> <span id="streetNum">{{delivery.street_number}}</span>
-                        </h5>
-                        <p class="card-text">Phone: <span id="phoneNum">{{delivery.phone_number}}</span></p>
+        <div class="container" id="addressesContainer">
+            {% if delivery_destinations %}
+                {% for destination in delivery_destinations %}
+                    <div class="card mb-3" style="width: 18rem;">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <span id="city">{{destination.city}}</span> - <span id="street">{{destination.street}}</span> <span id="streetNum">{{destination.street_number}}</span>
+                            </h5>
+                            <p class="card-text">Phone: <span id="phoneNum">{{destination.phone_number}}</span></p>
+                        </div>
+                        <button class="btn btn-outline-danger deleteAddressBtn" 
+                        data-city="{{destination.city}}" 
+                        data-street="{{destination.street}}" 
+                        data-streetNum="{{destination.street_number}}" 
+                        data-phoneNum="{{destination.phone_number}}">
+                            ❌
+                        </button>
                     </div>
-                </div>
-            {% endfor %}
+                {% endfor %}
+            {% endif %}
+        </div>
+        {% if delivery_details_provided_count < 3 %}
+            <div class="dropdown" id="addressDropdown" display="block">
         {% else %}
-            <div class="dropdown">
-                <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
-                    Add an address
-                </button>
-                <form class="dropdown-menu p-4">
-                    <div class="mb-3">
-                        <label for="dropdownCity" class="form-label">City</label>
-                        <input class="form-control" id="dropdownCity">
-                    </div>
-                    <div class="mb-3">
-                        <label for="dropdownStreet" class="form-label">Street</label>
-                        <input class="form-control" id="dropdownStreet" >
-                    </div>
-                    <div class="mb-3">
-                        <label for="dropdownStreetNumber" class="form-label">Street Number</label>
-                        <input class="form-control" id="dropdownStreetNumber" >
-                    </div>
-                    <div class="mb-3">
-                        <label for="dropdownPhoneNumber" class="form-label">Phone Number</label>
-                        <input class="form-control" id="dropdownPhoneNumber" >
-                    </div>
-                    <div class="mb-3">
-                        <button type="button" class="btn btn-primary" id="saveAddressBtn" >Save address</button>
-                    </div>
-                </form>
-            </div>
+            <div class="dropdown" id="addressDropdown" display="none">
         {% endif %}
+            <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+                Add an address
+            </button>
+            <form class="dropdown-menu p-4" id="addressMenu">
+                <div class="mb-3">
+                    <label for="dropdownCity" class="form-label">City</label>
+                    <input class="form-control" id="dropdownCity">
+                </div>
+                <div class="mb-3">
+                    <label for="dropdownStreet" class="form-label">Street</label>
+                    <input class="form-control" id="dropdownStreet" >
+                </div>
+                <div class="mb-3">
+                    <label for="dropdownStreetNumber" class="form-label">Street Number</label>
+                    <input class="form-control" id="dropdownStreetNumber" >
+                </div>
+                <div class="mb-3">
+                    <label for="dropdownPhoneNumber" class="form-label">Phone Number</label>
+                    <input class="form-control" id="dropdownPhoneNumber" >
+                </div>
+                <div class="mb-3">
+                    <button type="button" class="btn btn-primary" id="saveAddressBtn" >Save address</button>
+                </div>
+            </form>
+        </div>
     </div>
     <div class="col">
         total + checkout button 
@@ -68,4 +80,17 @@
 
 {% block scripts %}
     <script type="module" src="{% static 'DjangoMartApp/checkout.js' %}"></script>
+{% endblock %}
+
+{% block templates %}
+<template id="addressTemplate">
+    <div class="card mb-3" style="width: 18rem;">
+        <div class="card-body">
+            <h5 class="card-title">
+                <span id="city"></span> - <span id="street"></span> <span id="streetNum"></span>
+            </h5>
+            <p class="card-text">Phone: <span id="phoneNum"></span></p>
+        </div>
+    </div>
+</template>
 {% endblock %}
