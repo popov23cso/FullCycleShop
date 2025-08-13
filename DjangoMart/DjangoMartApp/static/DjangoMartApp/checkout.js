@@ -26,22 +26,13 @@ async function save_address() {
     const address_menu = document.querySelector('#addressMenu');
     const address_container = document.querySelector('#addressesContainer');
     let address_count = parseInt(address_container.dataset.addresscount);
-
-    try {
-        const response = await fetch ('/add_address', {
-            method: 'PUT',
-            headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCSRFToken(),
-            },
-            body: JSON.stringify({
+    const request_body = {
                 city: city,
                 street: street,
                 street_number: street_number,
                 phone_number: phone_number
-                })
-            })    
-            const response_data = await response.json();
+    }
+    const response_data = send_api_request('/add_address', request_body)
             if (response_data.error) {
                 display_toast('Error!', response_data.error, toast_background.ERROR);
             } else {
@@ -65,21 +56,13 @@ async function save_address() {
 async function remove_address(parent_element, city, street, street_number, phone_number) {
     const address_container = document.querySelector('#addressesContainer');
     let address_count = parseInt(address_container.dataset.addresscount);
-    try {
-        const response = await fetch ('/remove_address', {
-            method: 'PUT',
-            headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCSRFToken(),
-            },
-            body: JSON.stringify({
+    const request_body = {
                 city: city,
                 street: street,
                 street_number: street_number,
                 phone_number: phone_number
-                })
-            })    
-            const response_data = await response.json();
+    }
+    const response_data = send_api_request('/remove_address', request_body)
             if (response_data.error) {
                 display_toast('Error!', response_data.error, toast_background.ERROR);
             } else {

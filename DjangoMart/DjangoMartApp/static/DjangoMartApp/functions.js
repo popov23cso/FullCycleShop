@@ -42,3 +42,21 @@ export function show_element(selector) {
   const element = document.querySelector(selector);
   element.style.display = 'block';
 }
+
+export async function send_api_request(url, request_body) {
+    try {
+        const response = await fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken(),
+            },
+            body: JSON.stringify(request_body)
+        });
+        return await response.json();
+    } catch (err) {
+        console.error('Fetch error:', err);
+        display_toast('Error!', 'Something went wrong', toast_background.ERROR);
+        return { error: true };
+    }
+}
