@@ -1,10 +1,10 @@
-import { getCSRFToken, toast_background, display_toast, hide_element, show_element} from './functions.js';
+import { getCSRFToken, toast_background, display_toast, hide_element, show_element, send_api_request} from './functions.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('#saveAddressBtn').addEventListener('click', save_address);
 
-    const container = document.querySelector('#addressesContainer');
-    container.addEventListener('click', (event) => {
+    const address_container = document.querySelector('#addressesContainer');
+    address_container.addEventListener('click', (event) => {
     if (event.target.classList.contains('deleteAddressBtn')) {
         const btn = event.target;
         const parent = btn.closest('.card');
@@ -12,7 +12,11 @@ document.addEventListener('DOMContentLoaded', () => {
         remove_address(parent, city, street, streetnum, phonenum);
     }
     });
-
+    
+    const address_cards = document.querySelectorAll('.addressCard');
+    address_cards.forEach(item => {
+        item.addEventListener('click', e => {highlight_address(e.currentTarget)})
+    })
 })
 
 
@@ -27,27 +31,23 @@ async function save_address() {
     const address_container = document.querySelector('#addressesContainer');
     let address_count = parseInt(address_container.dataset.addresscount);
     const request_body = {
-                city: city,
-                street: street,
-                street_number: street_number,
-                phone_number: phone_number
+            city: city,
+            street: street,
+            street_number: street_number,
+            phone_number: phone_number
     }
     const response_data = send_api_request('/add_address', request_body)
-            if (response_data.error) {
-                display_toast('Error!', response_data.error, toast_background.ERROR);
-            } else {
-                display_toast('Success!', 'Added successfully', toast_background.SUCCESS);
-                display_address(city, street, street_number, phone_number);
-                address_count += 1;
-                if (address_count >= 3) {
-                    let address_dropdown_selector = '#addressDropdown';
-                    hide_element(address_dropdown_selector);
-                }
-                address_container.dataset.addresscount = address_count;
-            }
-    } catch (err) {
-        console.error('Fetch error:', err);
-        display_toast('Error!', 'Something went wrong', toast_background.ERROR);
+    if (response_data.error) {
+        display_toast('Error!', response_data.error, toast_background.ERROR);
+    } else {
+        display_toast('Success!', 'Added successfully', toast_background.SUCCESS);
+        display_address(city, street, street_number, phone_number);
+        address_count += 1;
+        if (address_count >= 3) {
+            let address_dropdown_selector = '#addressDropdown';
+            hide_element(address_dropdown_selector);
+        }
+        address_container.dataset.addresscount = address_count;
     }
     address_dropdown.classList.remove('show');
     address_menu.classList.remove('show');
@@ -63,26 +63,22 @@ async function remove_address(parent_element, city, street, street_number, phone
                 phone_number: phone_number
     }
     const response_data = send_api_request('/remove_address', request_body)
-            if (response_data.error) {
-                display_toast('Error!', response_data.error, toast_background.ERROR);
-            } else {
-                display_toast('Success!', 'Removed successfully', toast_background.SUCCESS);
-                parent_element.remove();
-                address_count -= 1;
-                let address_dropdown_selector = '#addressDropdown';
-                show_element(address_dropdown_selector);
-                address_container.dataset.addresscount = address_count;
-
-            }
-    } catch (err) {
-        console.error('Fetch error:', err);
-        display_toast('Error!', 'Something went wrong', toast_background.ERROR);
+    if (response_data.error) {
+        display_toast('Error!', response_data.error, toast_background.ERROR);
+    } else {
+        display_toast('Success!', 'Removed successfully', toast_background.SUCCESS);
+        parent_element.remove();
+        address_count -= 1;
+        let address_dropdown_selector = '#addressDropdown';
+        show_element(address_dropdown_selector);
+        address_container.dataset.addresscount = address_count;
     }
 }
 
 function display_address(city, street, street_number, phone_number) {
     const template = document.querySelector('#addressTemplate');
     const clone = template.content.cloneNode(true);
+    const card = clone.querySelector('.addressCard');
     const city_el = clone.querySelector('#city');
     const street_el = clone.querySelector('#street');
     const street_num_el = clone.querySelector('#streetNum');
@@ -98,5 +94,27 @@ function display_address(city, street, street_number, phone_number) {
     delete_btn.dataset.streetnum = street_number;
     delete_btn.dataset.phonenum = phone_number;
 
+    card.addEventListener('click',() => highlight_address(card));
+
     document.querySelector('#addressesContainer').appendChild(clone);
 }
+
+
+function highlight_address(address_box) {
+    unselect_not_clicked_addresses();
+    address_box.classList.remove('text-bg-warning');
+    address_box.classList.add('text-bg-success');
+    address_box.classList.add('selectedAddress');
+}
+
+function unselect_not_clicked_addresses() {
+    const address_cards = document.querySelectorAll('.addressCard');
+    address_cards.forEach(item => {
+        if (item.classList.contains('selectedAddress')) {
+            item.classList.remove('selectedAddress');
+            item.classList.remove('text-bg-success');
+            item.classList.add('text-bg-warning');
+        }
+    })
+}
+
