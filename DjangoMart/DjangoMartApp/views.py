@@ -97,15 +97,23 @@ def checkout(request):
         delivery_destinations = DeliveryDestination.objects.filter(user=request.user)
         available_tokens = request.user.available_tokens
         cart = ShoppingCart.objects.get(user_id=request.user)
-        cart_total_token_cost = cart.total_value()
+        cart_total_value = cart.total_value()
         delivery_details_provided_count = request.user.delivery_details_provided_count
-
+        balance_after_purchase = available_tokens - cart_total_value
+        can_afford_cart = balance_after_purchase >= 0
         return render_django_mart_app(request, 'checkout', {
             'available_tokens': available_tokens,
-            'cart_total_token_cost': cart_total_token_cost,
+            'cart_total_value': cart_total_value,
             'delivery_destinations': delivery_destinations,
-            'delivery_details_provided_count': delivery_details_provided_count
+            'delivery_details_provided_count': delivery_details_provided_count,
+            'can_afford_cart': can_afford_cart,
+            'balance_after_purchase': balance_after_purchase
         })
+    
+@login_required
+@require_http_methods(['PUT'])
+def finalize_checkout(request):
+    pass
     
 @login_required
 @require_http_methods(['PUT'])
