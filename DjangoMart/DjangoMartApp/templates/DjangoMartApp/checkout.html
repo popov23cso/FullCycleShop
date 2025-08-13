@@ -10,7 +10,7 @@
 {% block body %}
 <div class="row mt-3">
     <div class="col">
-        <div class="container" id="addressesContainer">
+        <div class="container" id="addressesContainer" data-addressCount="{{delivery_details_provided_count}}">
             {% if delivery_destinations %}
                 {% for destination in delivery_destinations %}
                     <div class="card mb-3" style="width: 18rem;">
@@ -32,9 +32,9 @@
             {% endif %}
         </div>
         {% if delivery_details_provided_count < 3 %}
-            <div class="dropdown" id="addressDropdown" display="block">
+            <div class="dropdown" id="addressDropdown">
         {% else %}
-            <div class="dropdown" id="addressDropdown" display="none">
+            <div class="dropdown" id="addressDropdown" style="display: none;">
         {% endif %}
             <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
                 Add an address
@@ -91,6 +91,9 @@
             </h5>
             <p class="card-text">Phone: <span id="phoneNum"></span></p>
         </div>
+        <button class="btn btn-outline-danger deleteAddressBtn">
+            ❌
+        </button>
     </div>
 </template>
 {% endblock %}
