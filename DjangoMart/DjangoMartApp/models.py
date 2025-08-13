@@ -26,7 +26,7 @@ class DeliveryDestination(models.Model):
     city = models.CharField(max_length=100)
     street = models.CharField(max_length=100)
     street_number = models.PositiveIntegerField(blank=True, null=True)
-    phone_number = models.PositiveIntegerField()
+    phone_number = models.CharField(max_length=15)
 
 class DeliveryTracking(models.Model):
     class Status(models.TextChoices):
