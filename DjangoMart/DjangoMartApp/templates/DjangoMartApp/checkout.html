@@ -14,18 +14,15 @@
         <div class="container" id="addressesContainer" data-addressCount="{{delivery_details_provided_count}}">
             {% if delivery_destinations %}
                 {% for destination in delivery_destinations %}
-                    <div class="card mb-3 text-bg-warning" style="width: 18rem;">
-                        <div class="card-body addressCard rounded">
+                <div class="card mb-3 text-bg-warning" style="width: 18rem;">
+                        <div class="card-body addressCard rounded" data-id="{{destination.id}}">
                             <h5 class="card-title">
                                 <span id="city">{{destination.city}}</span> - <span id="street">{{destination.street}}</span> <span id="streetNum">{{destination.street_number}}</span>
                             </h5>
                             <p class="card-text">Phone: <span id="phoneNum">{{destination.phone_number}}</span></p>
                         </div>
                         <button class="btn btn-outline-danger deleteAddressBtn" 
-                        data-city="{{destination.city}}" 
-                        data-street="{{destination.street}}" 
-                        data-streetNum="{{destination.street_number}}" 
-                        data-phoneNum="{{destination.phone_number}}">
+                        data-id="{{destination.id}}">
                             ❌
                         </button>
                     </div>
@@ -67,7 +64,12 @@
         <h4 class="mb-3"><span class="text-success">TOTAL: {{cart_total_value}}</span></h4>
         {% if can_afford_cart %}
             <h4 class="mb-3"><span class="text-success">Tokens after purchase: {{balance_after_purchase}}</span></h4>
-            <button type="button" class="btn btn-outline-success" id="checkoutBtn" >Confirm order</button>
+            <form action="{% url 'checkout' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="priceTotal" value="{{cart_total_value}}">
+                <input type="hidden" id="addressID" name="addressID" value="">
+                <button type="submit" class="btn btn-outline-success" id="checkoutBtn" style="display: none">Confirm order</button>
+            </form>
         {% else %}
             <h4 class="mb-3"><span class="text-danger">Insufficient tokens available. Current balance: {{available_tokens}}</span></h4>
         {% endif %}

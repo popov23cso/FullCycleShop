@@ -109,6 +109,8 @@ def checkout(request):
             'can_afford_cart': can_afford_cart,
             'balance_after_purchase': balance_after_purchase
         })
+    elif request.method == 'POST':
+        pass
     
 @login_required
 @require_http_methods(['PUT'])
@@ -142,29 +144,17 @@ def add_address(request):
     request.user.delivery_details_provided_count += 1
     request.user.save()
 
-    return JsonResponse(model_to_dict(delivery_destination, fields=[
-        'city',
-        'street',
-        'street_number',
-        'phone_number'])
-        , status=200)
+    return JsonResponse(model_to_dict(delivery_destination, fields=['id']), status=200)
 
 @login_required
 @require_http_methods(['PUT'])
 def remove_address(request):
     request_body = json.loads(request.body)
-    city = request_body.get('city')
-    street = request_body.get('street')
-    street_number = request_body.get('street_number')
-    phone_number = request_body.get('phone_number')
-    print(city, street, street_number, phone_number)
+    id = request_body.get('id')
     try:
         delivery_destination = DeliveryDestination.objects.get(
         user=request.user,
-        city=city,
-        street=street,
-        street_number=street_number,
-        phone_number=phone_number
+        id=id
     )
     except DeliveryDestination.DoesNotExist:
         return JsonResponse({'error': 'No such delivery address exists for this user'}, status=404)
