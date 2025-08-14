@@ -47,7 +47,7 @@ class DeliveryTracking(models.Model):
         choices=Status.choices,
         default=Status.COLLECTING,
     )
-    purchase = models.ForeignKey('Purchase', on_delete=models.CASCADE)
+    purchase = models.ForeignKey('Purchase', on_delete=models.DO_NOTHING)
     created_date = models.DateTimeField(auto_now_add=True)
     delivered_date = models.DateTimeField(blank=True, null=True)
     
@@ -117,6 +117,9 @@ class ShoppingCart(models.Model):
     def total_value(self):
         cart_items = self.cart_items.select_related('product')
         return sum(item.quantity * item.product.price for item in cart_items)
+    def empty_cart(self):
+        self.cart_items.all().delete()
+        self.total_items_count = 0
 
 class CartItem(models.Model):
     cart = models.ForeignKey(ShoppingCart, on_delete=models.CASCADE, related_name='cart_items')

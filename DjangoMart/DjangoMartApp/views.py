@@ -1,4 +1,4 @@
-from .models import User, Category, Product, ShoppingCart, CartItem, DeliveryDestination
+from .models import User, Category, Product, ShoppingCart, CartItem, DeliveryDestination, Purchase, PurchaseItem, DeliveryTracking
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import IntegrityError
@@ -110,12 +110,41 @@ def checkout(request):
             'balance_after_purchase': balance_after_purchase
         })
     elif request.method == 'POST':
-        pass
+        address_id = request.POST.get('addressID')
+        total_value = float(request.POST.get('totalValue'))
+        cart = ShoppingCart.objects.get(user_id=request.user)
+        cart_items = cart.cart_items.select_related('product')
+
+        purchase = Purchase.objects.create(user=request.user, total_price=total_value)
+
+        for item in cart_items:
+            PurchaseItem.objects.create(purchase=purchase,
+                                        product_name=item.product.title,
+                                        product_id=item.product.id,
+                                        price_at_purchase=item.product.price,
+                                        quantity=item.quantity)
+        delivery_destination = DeliveryDestination.objects.get(id=address_id)
+        DeliveryTracking.objects.create(user=request.user,
+                                        delivery_destination=delivery_destination,
+                                        city=delivery_destination.city,
+                                        street=delivery_destination.street,
+                                        street_number=delivery_destination.street_number,
+                                        phone_number=delivery_destination.phone_number,
+                                        status=DeliveryTracking.Status.COLLECTING,
+                                        purchase=purchase)
+        
+        cart.empty_cart()
+        request.user.total_purchased_amount += total_value
+        request.user.available_tokens -= total_value
+        request.user.save()
+        return redirect('orders')
+
     
 @login_required
-@require_http_methods(['PUT'])
-def finalize_checkout(request):
-    pass
+def orders(request):
+    deliveries = DeliveryTracking.objects.filter(user=request.user)
+    return render_django_mart_app(request, 'orders', {'deliveries':deliveries})
+ 
     
 @login_required
 @require_http_methods(['PUT'])
@@ -150,11 +179,11 @@ def add_address(request):
 @require_http_methods(['PUT'])
 def remove_address(request):
     request_body = json.loads(request.body)
-    id = request_body.get('id')
+    address_id = request_body.get('address_id')
     try:
         delivery_destination = DeliveryDestination.objects.get(
         user=request.user,
-        id=id
+        id=address_id
     )
     except DeliveryDestination.DoesNotExist:
         return JsonResponse({'error': 'No such delivery address exists for this user'}, status=404)
