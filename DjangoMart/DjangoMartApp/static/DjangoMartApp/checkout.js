@@ -8,8 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (event.target.classList.contains('deleteAddressBtn')) {
         const btn = event.target;
         const parent = btn.closest('.card');
-        const id = btn.dataset.id;
-        remove_address(parent, id);
+        const address_id = btn.dataset.id;
+        remove_address(parent, address_id);
     }
     });
     
@@ -53,11 +53,11 @@ async function save_address() {
     address_menu.classList.remove('show');
 }
 
-async function remove_address(parent_element, id) {
+async function remove_address(parent_element, address_id) {
     const address_container = document.querySelector('#addressesContainer');
     let address_count = parseInt(address_container.dataset.addresscount);
     const request_body = {
-                id: id
+                address_id: address_id
     }
     const response_data = await send_api_request('/remove_address', request_body);
     if (response_data.error) {

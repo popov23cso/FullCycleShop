@@ -1,0 +1,29 @@
+{% extends "DjangoMartApp/layout.html" %}
+
+{% load static %}
+
+{% block title %}
+    Orders
+{% endblock %}
+
+{% block body %}
+    {% for delivery in deliveries %}
+    <div class="card" style="width: 18rem;">
+        <!-- <a href="{% url 'delivery' delivery.id %}"> -->
+            <svg aria-label="Placeholder: Image cap" class="bd-placeholder-img card-img-top" height="180" preserveAspectRatio="xMidYMid slice" role="img" width="100%" xmlns="http://www.w3.org/2000/svg">
+            <title>{{delivery.city}}</title>
+            <rect width="100%" height="100%" fill="#868e96">
+            </rect>
+            <text x="40%" y="50%" fill="#dee2e6" dy=".3em">
+                Image cap
+            </text>
+            </svg>
+            <div class="card-body">
+            <h5 class="card-title">pass</h5>
+            <p class="card-text">pass</p>
+            </div>
+        <!-- </a> -->
+    </div>
+    {% endfor %}
+{% endblock %}
+
