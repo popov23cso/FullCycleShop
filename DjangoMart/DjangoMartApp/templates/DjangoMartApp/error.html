@@ -1,0 +1,14 @@
+{% extends "DjangoMartApp/layout.html" %}
+
+{% block title %}
+    Error
+{% endblock %}
+
+{% block body %}
+    <div class="alert alert-danger" role="alert">
+        {{message}}
+    </div>
+    <a href="{% url 'homepage' %}">
+        <button type="button" class="btn btn-outline-warning">Go Back</button>
+    </a>
+{% endblock %}

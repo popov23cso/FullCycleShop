@@ -12,7 +12,7 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=50)
     phone_number = models.CharField(max_length=15, blank=True)
     total_purchased_amount = models.FloatField(default=0)
-    available_tokens = models.FloatField(default=500)
+    available_tokens = models.FloatField(default=500,  validators=[MinValueValidator(0)])
     delivery_details_provided_count = models.PositiveSmallIntegerField(default=0, validators=[MaxValueValidator(3)])
     is_deleted = models.BooleanField(default=False)
     created_date = models.DateTimeField(default=timezone.now, editable=False)

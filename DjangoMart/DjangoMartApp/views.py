@@ -1,7 +1,7 @@
 from .models import User, Category, Product, ShoppingCart, CartItem, DeliveryDestination, Purchase, PurchaseItem, DeliveryTracking
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.contrib.auth import authenticate, login, logout
 from .functions import render_django_mart_app, product_has_enough_stock, add_product_to_cart
 from django.core.exceptions import ObjectDoesNotExist
@@ -110,34 +110,57 @@ def checkout(request):
             'balance_after_purchase': balance_after_purchase
         })
     elif request.method == 'POST':
-        address_id = request.POST.get('addressID')
-        total_value = float(request.POST.get('totalValue'))
-        cart = ShoppingCart.objects.get(user_id=request.user)
-        cart_items = cart.cart_items.select_related('product')
+        # if anything fails roll back all changes
+        with transaction.atomic():
+            address_id = request.POST.get('addressID')
+            cart = ShoppingCart.objects.select_for_update().get(user_id=request.user)
+            total_value = cart.total_value()
+            if total_value > request.user.available_tokens:
+                return render_django_mart_app(request, 'error', {'message':'Insufficient tokens to complete transaction'})
 
-        purchase = Purchase.objects.create(user=request.user, total_price=total_value)
+            cart_items = cart.cart_items.select_related('product').select_for_update(of=('product',))
+            purchase = Purchase.objects.create(user=request.user, total_price=total_value)
 
-        for item in cart_items:
-            PurchaseItem.objects.create(purchase=purchase,
-                                        product_name=item.product.title,
-                                        product_id=item.product.id,
-                                        price_at_purchase=item.product.price,
-                                        quantity=item.quantity)
-        delivery_destination = DeliveryDestination.objects.get(id=address_id)
-        DeliveryTracking.objects.create(user=request.user,
-                                        delivery_destination=delivery_destination,
-                                        city=delivery_destination.city,
-                                        street=delivery_destination.street,
-                                        street_number=delivery_destination.street_number,
-                                        phone_number=delivery_destination.phone_number,
-                                        status=DeliveryTracking.Status.COLLECTING,
-                                        purchase=purchase)
-        
-        cart.empty_cart()
-        request.user.total_purchased_amount += total_value
-        request.user.available_tokens -= total_value
-        request.user.save()
-        return redirect('orders')
+            for item in cart_items:
+                if item.product.stock < item.quantity:
+                    return render_django_mart_app(request,'error', {'message': 
+                                                                    f"Product {item.product.title} has insufficient stock: " +
+                                                                    f"\n{item.quantity} in cart, {item.product.stock} in stock"})
+            purchase_items = [
+                PurchaseItem(
+                    purchase=purchase,
+                    product_name=item.product.title,
+                    product_id=item.product.id,
+                    price_at_purchase=item.product.price,
+                    quantity=item.quantity)
+                for item in cart_items
+            ]
+
+            PurchaseItem.objects.bulk_create(purchase_items)
+
+            try:
+                delivery_destination = DeliveryDestination.objects.get(id=address_id, user=request.user)
+            except DeliveryDestination.DoesNotExist:
+                return render_django_mart_app(request, 'error', {'message':'The requested address does not exist for this user'})
+
+            DeliveryTracking.objects.create(user=request.user,
+                                            delivery_destination=delivery_destination,
+                                            city=delivery_destination.city,
+                                            street=delivery_destination.street,
+                                            street_number=delivery_destination.street_number,
+                                            phone_number=delivery_destination.phone_number,
+                                            status=DeliveryTracking.Status.COLLECTING,
+                                            purchase=purchase)
+            
+            cart.empty_cart()
+            for item in cart_items:
+                item.product.stock -= item.quantity
+            Product.objects.bulk_update([item.product for item in cart_items], ['stock'])
+
+            request.user.total_purchased_amount += total_value
+            request.user.available_tokens -= total_value
+            request.user.save()
+            return redirect('orders')
 
     
 @login_required
