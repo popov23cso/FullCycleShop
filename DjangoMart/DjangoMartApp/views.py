@@ -167,7 +167,14 @@ def checkout(request):
 def orders(request):
     deliveries = DeliveryTracking.objects.filter(user=request.user)
     return render_django_mart_app(request, 'orders', {'deliveries':deliveries})
- 
+
+@login_required
+def delivery(request, delivery_id):
+    try:
+        delivery_object = DeliveryTracking.objects.get(user=request.user, id=delivery_id)
+    except DeliveryTracking.DoesNotExist:
+        return render_django_mart_app(request, 'error', {'message':'The requested delivery does not exist for this user'})
+    return render_django_mart_app(request, 'delivery', {'delivery':delivery_object})
     
 @login_required
 @require_http_methods(['PUT'])
@@ -216,10 +223,6 @@ def remove_address(request):
     request.user.save()
 
     return JsonResponse({'message': 'Address deleted successfully'}, status=200)
-
-
-
-
 
 def login_view(request):
     if request.method == 'POST':

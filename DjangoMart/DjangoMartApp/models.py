@@ -36,7 +36,9 @@ class DeliveryTracking(models.Model):
         DELIVERED = 'Delivered'
         CANCELLED = 'Cancelled'
 
-    delivery_destination = models.ForeignKey(DeliveryDestination, on_delete=models.DO_NOTHING)
+    delivery_destination = models.ForeignKey(DeliveryDestination,
+                                            on_delete=models.DO_NOTHING, 
+                                            related_name='delivery_tracking')
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     city = models.CharField(max_length=100)
     street = models.CharField(max_length=100)
@@ -47,7 +49,9 @@ class DeliveryTracking(models.Model):
         choices=Status.choices,
         default=Status.COLLECTING,
     )
-    purchase = models.ForeignKey('Purchase', on_delete=models.DO_NOTHING)
+    purchase = models.ForeignKey('Purchase', 
+                                 on_delete=models.DO_NOTHING,
+                                 related_name='delivery_tracking')
     created_date = models.DateTimeField(auto_now_add=True)
     delivered_date = models.DateTimeField(blank=True, null=True)
     
@@ -120,6 +124,7 @@ class ShoppingCart(models.Model):
     def empty_cart(self):
         self.cart_items.all().delete()
         self.total_items_count = 0
+        self.save()
 
 class CartItem(models.Model):
     cart = models.ForeignKey(ShoppingCart, on_delete=models.CASCADE, related_name='cart_items')
