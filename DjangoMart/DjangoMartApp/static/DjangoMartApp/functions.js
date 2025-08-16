@@ -13,9 +13,9 @@ export const toast_background = {
 
 
 export function display_toast(message, body, background) {
-  const toast_element = document.getElementById('liveToast');
-  const toast_message = document.getElementById('toastMessage');
-  const toast_body = document.getElementById('toastBody');
+  const toast_element = document.querySelector('#liveToast');
+  const toast_message = document.querySelector('#toastMessage');
+  const toast_body = document.querySelector('#toastBody');
 
   toast_element.classList.remove(toast_background.SUCCESS, toast_background.ERROR);
   toast_element.classList.add(background);
@@ -29,6 +29,34 @@ export function display_toast(message, body, background) {
 
 
 export function adjust_int_value_by_id(change_ammount, element_id) {
-  const element = document.getElementById(element_id);
+  const element = document.querySelector('#' + element_id);
   element.innerText = parseInt(element.innerText, 10) + change_ammount;
+}
+
+export function hide_element(selector) {
+  const element = document.querySelector(selector);
+  element.style.display = 'none';
+}
+
+export function show_element(selector) {
+  const element = document.querySelector(selector);
+  element.style.display = 'block';
+}
+
+export async function send_api_request(url, request_body) {
+    try {
+        const response = await fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken(),
+            },
+            body: JSON.stringify(request_body)
+        });
+        return await response.json();
+    } catch (err) {
+        console.error('Fetch error:', err);
+        display_toast('Error!', 'Something went wrong', toast_background.ERROR);
+        return { error: true };
+    }
 }

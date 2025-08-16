@@ -12,7 +12,7 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=50)
     phone_number = models.CharField(max_length=15, blank=True)
     total_purchased_amount = models.FloatField(default=0)
-    available_tokens = models.FloatField(default=500)
+    available_tokens = models.FloatField(default=500,  validators=[MinValueValidator(0)])
     delivery_details_provided_count = models.PositiveSmallIntegerField(default=0, validators=[MaxValueValidator(3)])
     is_deleted = models.BooleanField(default=False)
     created_date = models.DateTimeField(default=timezone.now, editable=False)
@@ -26,7 +26,7 @@ class DeliveryDestination(models.Model):
     city = models.CharField(max_length=100)
     street = models.CharField(max_length=100)
     street_number = models.PositiveIntegerField(blank=True, null=True)
-    phone_number = models.PositiveIntegerField()
+    phone_number = models.CharField(max_length=15)
 
 class DeliveryTracking(models.Model):
     class Status(models.TextChoices):
@@ -36,7 +36,9 @@ class DeliveryTracking(models.Model):
         DELIVERED = 'Delivered'
         CANCELLED = 'Cancelled'
 
-    delivery_destination = models.ForeignKey(DeliveryDestination, on_delete=models.DO_NOTHING)
+    delivery_destination = models.ForeignKey(DeliveryDestination,
+                                            on_delete=models.DO_NOTHING, 
+                                            related_name='delivery_tracking')
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     city = models.CharField(max_length=100)
     street = models.CharField(max_length=100)
@@ -47,7 +49,9 @@ class DeliveryTracking(models.Model):
         choices=Status.choices,
         default=Status.COLLECTING,
     )
-    purchase = models.ForeignKey('Purchase', on_delete=models.CASCADE)
+    purchase = models.ForeignKey('Purchase', 
+                                 on_delete=models.DO_NOTHING,
+                                 related_name='delivery_tracking')
     created_date = models.DateTimeField(auto_now_add=True)
     delivered_date = models.DateTimeField(blank=True, null=True)
     
@@ -117,6 +121,10 @@ class ShoppingCart(models.Model):
     def total_value(self):
         cart_items = self.cart_items.select_related('product')
         return sum(item.quantity * item.product.price for item in cart_items)
+    def empty_cart(self):
+        self.cart_items.all().delete()
+        self.total_items_count = 0
+        self.save()
 
 class CartItem(models.Model):
     cart = models.ForeignKey(ShoppingCart, on_delete=models.CASCADE, related_name='cart_items')

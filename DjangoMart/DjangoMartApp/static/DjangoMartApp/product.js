@@ -6,8 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 async function add_to_cart() {
-  const product_id = document.getElementById('productId').value;
-  const quantity = parseInt(document.getElementById('quantity').value, 10);
+  const product_id = document.querySelector('#productId').value;
+  const quantity = parseInt(document.querySelector('#quantity').value, 10);
 
   try {
   const response = await fetch('/add_to_cart', {
