@@ -122,7 +122,7 @@ def checkout(request):
             purchase = Purchase.objects.create(user=request.user, total_price=total_value)
 
             for item in cart_items:
-                if item.product.stock < item.quantity:
+                if not product_has_enough_stock(item.product, item.quantity):
                     return render_django_mart_app(request,'error', {'message': 
                                                                     f"Product {item.product.title} has insufficient stock: " +
                                                                     f"\n{item.quantity} in cart, {item.product.stock} in stock"})
@@ -171,10 +171,13 @@ def orders(request):
 @login_required
 def delivery(request, delivery_id):
     try:
-        delivery_object = DeliveryTracking.objects.get(user=request.user, id=delivery_id)
+        delivery = (DeliveryTracking.objects
+                    .select_related('purchase')
+                    .prefetch_related('purchase__purchase_items')
+                    .get(user=request.user, id=delivery_id))
     except DeliveryTracking.DoesNotExist:
         return render_django_mart_app(request, 'error', {'message':'The requested delivery does not exist for this user'})
-    return render_django_mart_app(request, 'delivery', {'delivery':delivery_object})
+    return render_django_mart_app(request, 'delivery', {'delivery':delivery})
     
 @login_required
 @require_http_methods(['PUT'])
