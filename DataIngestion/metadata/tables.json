@@ -1,6 +1,6 @@
 {
-    "database_name": "db.sqlite3",
-    "tables": [
+    "base_url": "http://127.0.0.1:8000/",
+    "get_purchases": [
         {
             "name": "DjangoMartApp_user",
             "last_ingestion_dtt": "2025-01-09 11:20:09.227018"

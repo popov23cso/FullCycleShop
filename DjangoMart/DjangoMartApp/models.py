@@ -136,6 +136,7 @@ class Purchase(models.Model):
     total_price = models.FloatField()
     is_invalid = models.BooleanField(default=False)
     created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
 
 class PurchaseItem(models.Model):
     purchase = models.ForeignKey(Purchase, on_delete=models.DO_NOTHING, related_name='purchase_items')

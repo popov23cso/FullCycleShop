@@ -8,7 +8,13 @@ from .views.web import (homepage_view, login_view, register,
 from .views.api import (add_to_cart, remove_from_cart, add_address,
                   remove_address)
 
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView
+)
+
 urlpatterns = [
+    # Webpage views
     path('', homepage_view, name='homepage'),
     path('login', login_view, name='login_view'),
     path('register', register, name='register'),
@@ -16,11 +22,17 @@ urlpatterns = [
     path('category/<str:category_slug>', category_view, name='category'),
     path('cart', cart_view, name='cart'),
     path('product/<int:product_id>', product_view, name='product'),
+    path('checkout', checkout, name='checkout'),
+    path('orders', orders, name='orders'),
+    path('delivery/<int:delivery_id>', delivery, name='delivery'),
+
+    # API`s
     path('add_to_cart', add_to_cart, name='add_to_cart'),
     path('remove_from_cart', remove_from_cart, name='remove_from_cart'),
-    path('checkout', checkout, name='checkout'),
     path('add_address', add_address, name='add_address'),
     path('remove_address', remove_address, name='remove_address'),
-    path('orders', orders, name='orders'),
-    path('delivery/<int:delivery_id>', delivery, name='delivery')
+
+    # Token based authentication
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh')
 ]

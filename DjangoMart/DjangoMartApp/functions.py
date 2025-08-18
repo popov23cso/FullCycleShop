@@ -1,6 +1,7 @@
 from django.db.models import F
 from django.shortcuts import render
-from .models import CartItem, ShoppingCart, Purchase, PurchaseItem, Product
+from .models import CartItem, ShoppingCart
+import datetime
 
 
 def add_product_to_cart(user, product, quantity):
@@ -26,4 +27,10 @@ def render_django_mart_app(request, template_name, context=None):
         context = {}
     full_template_name = f'DjangoMartApp/{template_name}.html'
     return render(request, full_template_name, context)
+
+def parse_date(date):
+    try:
+        return datetime.fromisoformat(date)
+    except (TypeError, ValueError):
+        return None
 
