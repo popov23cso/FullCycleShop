@@ -12,6 +12,7 @@ async function add_to_cart() {
   try {
   const response = await fetch('/add_to_cart', {
     method: 'PUT',
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
       'X-CSRFToken': getCSRFToken(),

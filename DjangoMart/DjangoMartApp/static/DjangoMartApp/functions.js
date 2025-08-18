@@ -47,6 +47,7 @@ export async function send_api_request(url, request_body) {
     try {
         const response = await fetch(url, {
             method: 'PUT',
+            credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': getCSRFToken(),
