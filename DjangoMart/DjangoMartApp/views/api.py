@@ -1,17 +1,13 @@
 from ..models import (Product, ShoppingCart, CartItem, 
                      DeliveryDestination, Purchase)
 from ..functions import  product_has_enough_stock, add_product_to_cart, parse_date
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_http_methods
-from django.http import JsonResponse
 from django.forms.models import model_to_dict
-import json 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
-@api_view(['PUT'])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_to_cart(request):
     try:
@@ -35,7 +31,7 @@ def add_to_cart(request):
         return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
 
     
-@api_view(['PUT'])
+@api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def remove_from_cart(request):
     try:
@@ -61,7 +57,7 @@ def remove_from_cart(request):
         return Response({'error': 'Item not found in cart'}, status=status.HTTP_404_NOT_FOUND)
 
     
-@api_view(['PUT'])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_address(request):
 
@@ -89,7 +85,7 @@ def add_address(request):
 
     return Response(model_to_dict(delivery_destination, fields=['id']), status=status.HTTP_200_OK)
 
-@api_view(['PUT'])
+@api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def remove_address(request):
     address_id = request.data.get('address_id')
