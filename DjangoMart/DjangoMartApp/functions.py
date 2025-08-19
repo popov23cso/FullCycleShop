@@ -1,7 +1,7 @@
 from django.db.models import F
 from django.shortcuts import render
 from .models import CartItem, ShoppingCart
-import datetime
+from datetime import datetime
 
 
 def add_product_to_cart(user, product, quantity):

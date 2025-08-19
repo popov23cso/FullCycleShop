@@ -127,10 +127,10 @@ def get_purchases(request):
     filter_date = updated_after if updated_after is not None else created_after
     
     if updated_after is not None:
-        products = Product.objects.filter(updated_after__gte=filter_date)
+        purchases = Purchase.objects.filter(updated_date__gte=filter_date)
     else:
-        products = Product.objects.filter(created_after__gte=filter_date)
+        purchases = Purchase.objects.filter(created_after__gte=filter_date)
 
-    products = list(products.values())
+    purchases = list(purchases.values())
 
-    return Response({"success": True, "products": products}, status=status.HTTP_200_OK)
+    return Response({"success": True, "purchases": purchases}, status=status.HTTP_200_OK)
