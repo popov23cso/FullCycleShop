@@ -1,6 +1,8 @@
 from ..models import (Product, ShoppingCart, CartItem, 
                      DeliveryDestination, Purchase)
-from ..functions import  product_has_enough_stock, add_product_to_cart, parse_date
+from .utility import  (product_has_enough_stock, add_product_to_cart, parse_date,
+                       ApiPagination, PurchaseSerializer)
+
 from django.forms.models import model_to_dict
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -113,14 +115,14 @@ def get_purchases(request):
         return Response(
             {
                 'success':False,
-                'message': 'Created_after and updated_after cannot be passed at the same time'
+                'error': 'Created_after and updated_after cannot be passed at the same time'
             },
             status=status.HTTP_400_BAD_REQUEST)
     elif updated_after is None and created_after is None:
         return Response(
             {
-            'success':False,
-            'message': 'Supplying updated_after or created_after parameter is required. Passed dates need to be in valid ISO 8601 format'
+                'success':False,
+                'error': 'Supplying updated_after or created_after parameter is required. Passed dates need to be in valid ISO 8601 format'
             }, 
              status=status.HTTP_400_BAD_REQUEST)
     
@@ -131,6 +133,16 @@ def get_purchases(request):
     else:
         purchases = Purchase.objects.filter(created_after__gte=filter_date)
 
-    purchases = list(purchases.values())
+    paginator = ApiPagination()
+    results_page = paginator.paginate_queryset(purchases, request)
+    serializer = PurchaseSerializer(results_page, many=True)
 
-    return Response({"success": True, "purchases": purchases}, status=status.HTTP_200_OK)
+    # get only the response data instead of the entire Response object
+    purchases = paginator.get_paginated_response(serializer.data).data
+
+    return Response(
+    {
+        "success": True,
+        "data": purchases
+    },
+    status=status.HTTP_200_OK)

@@ -1,8 +1,22 @@
 from django.db.models import F
 from django.shortcuts import render
-from .models import CartItem, ShoppingCart
+from ..models import CartItem, ShoppingCart, Purchase
 from datetime import datetime
+from rest_framework.pagination import PageNumberPagination
+from rest_framework import serializers
 
+
+class PurchaseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Purchase
+        fields = "__all__" 
+
+class ApiPagination(PageNumberPagination):
+    page_size = 50
+
+    # the users can pass ?page_size=X (X<=100) to get more results per page 
+    page_size_query_param = "page_size" 
+    max_page_size = 100
 
 def add_product_to_cart(user, product, quantity):
     cart, created = ShoppingCart.objects.get_or_create(user_id=user)

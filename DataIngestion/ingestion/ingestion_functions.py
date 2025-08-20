@@ -41,44 +41,52 @@ def refresh_access_token(refresh_token):
     
     return data['access']
 
-def get_djangomart_data(access_token, endpoint, data_key, updated_after):
+def get_djangomart_data(access_token, endpoint, updated_after):
     base_url = 'http://127.0.0.1:8000/'
     full_url = base_url + endpoint
 
     headers = {
-    "Authorization": f"Bearer {access_token}"
+        "Authorization": f"Bearer {access_token}"
     }
 
     params = {
         'updated_after': updated_after
     }
 
-    try:
-        response = requests.get(full_url, headers=headers, params=params)
-        response.raise_for_status()
-    except requests.exceptions.RequestException as e:
-        raise RuntimeError(f"Error while requesting {endpoint} data: {e}")
-    
-    response_data = response.json()
-    if response_data['success']:
-        current_datetime = datetime.datetime.now()
-        current_datetime = current_datetime.strftime('%Y%m%d%H%M%S')
+    all_data = []
 
+    while full_url is not None:    
+        try:
+            response = requests.get(full_url, headers=headers, params=params)
+            # TODO add a check for expired access token
+            response.raise_for_status()
+        except requests.exceptions.RequestException as e:
+            raise RuntimeError(f"Error while requesting {endpoint} data: {e}")
+        
+        response_data = response.json()
+        if response_data['success']:
+            df = pd.DataFrame(response_data['data']['results'])
+            all_data.append(df)
+        else:
+            return None 
+        
+        full_url = response_data['data']['next']
+        
+    current_datetime = datetime.datetime.now()
+    current_datetime = current_datetime.strftime('%Y%m%d%H%M%S')
+    file_name = endpoint + '_' + current_datetime + '.parquet'
+    current_dir = Path.cwd()
+    file_path = current_dir.parents[1] / "DataLake" / "DjangoMart" / file_name
 
-        file_name = endpoint + '_' + current_datetime + '.parquet'
+    # duckdb cannot read directly in memory python objects so an intermediate step is needed
+    df = pd.concat(all_data, ignore_index=True)
+    with duckdb.connect() as con:
+        con.register("object_data", df)
+        con.execute(
+            f"COPY (SELECT * FROM object_data) TO '{file_path}' (FORMAT PARQUET)"
+        )
 
-        current_dir = Path.cwd()
-        file_path = current_dir.parents[1] / "DataLake" / "DjangoMart" / file_name
+    return file_name
 
-        object_data = response_data[data_key]
-
-        # duckdb cannot read directly in memory python objects so an intermediate step is needed
-        df = pd.DataFrame(object_data)
-
-        with duckdb.connect() as con:
-            con.register("object_data", df)
-            con.execute(
-                f"COPY (SELECT * FROM object_data) TO '{file_path}' (FORMAT PARQUET)"
-            )
-
-        return file_name
+refresh, access = get_djangomart_auth_tokens(DJANGOMART_USERNAME, DJANGOMART_PASSWORD)
+get_djangomart_data(access, 'get_purchases', '2025-01-01')
