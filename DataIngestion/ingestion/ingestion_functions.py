@@ -41,14 +41,9 @@ def refresh_access_token(refresh_token):
     
     return data['access']
 
-def get_djangomart_data(access_token, endpoint, updated_after):
+def get_djangomart_data(access_token, refresh_token, endpoint, updated_after):
     base_url = 'http://127.0.0.1:8000/'
-    full_url = base_url + endpoint
-
-    headers = {
-        "Authorization": f"Bearer {access_token}"
-    }
-
+    full_url = base_url + endpoint    
     params = {
         'updated_after': updated_after
     }
@@ -56,9 +51,21 @@ def get_djangomart_data(access_token, endpoint, updated_after):
     all_data = []
 
     while full_url is not None:    
+        headers = {
+            "Authorization": f"Bearer {access_token}"
+        }
+
         try:
             response = requests.get(full_url, headers=headers, params=params)
-            # TODO add a check for expired access token
+            
+            if response.status_code == 401:
+                try: 
+                    access_token = refresh_access_token(refresh_token)
+                except ValueError as e: 
+                    raise RuntimeError(f'Error while requesting a new access token: {e}')
+                
+                continue
+
             response.raise_for_status()
         except requests.exceptions.RequestException as e:
             raise RuntimeError(f"Error while requesting {endpoint} data: {e}")
@@ -89,4 +96,4 @@ def get_djangomart_data(access_token, endpoint, updated_after):
     return file_name
 
 refresh, access = get_djangomart_auth_tokens(DJANGOMART_USERNAME, DJANGOMART_PASSWORD)
-get_djangomart_data(access, 'get_purchases', '2025-01-01')
+get_djangomart_data(access, refresh, 'get_purchases', '2025-01-01')
