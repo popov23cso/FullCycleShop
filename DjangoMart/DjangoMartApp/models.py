@@ -15,6 +15,9 @@ class User(AbstractUser):
     available_tokens = models.FloatField(default=500,  validators=[MinValueValidator(0)])
     delivery_details_provided_count = models.PositiveSmallIntegerField(default=0, validators=[MaxValueValidator(3)])
     is_deleted = models.BooleanField(default=False)
+
+    # users who are approved are assigned this permission by admins
+    is_api_user = models.BooleanField(default=False)
     created_date = models.DateTimeField(default=timezone.now, editable=False)
     updated_date = models.DateTimeField(auto_now=True)
 
@@ -136,6 +139,7 @@ class Purchase(models.Model):
     total_price = models.FloatField()
     is_invalid = models.BooleanField(default=False)
     created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
 
 class PurchaseItem(models.Model):
     purchase = models.ForeignKey(Purchase, on_delete=models.DO_NOTHING, related_name='purchase_items')

@@ -7,6 +7,29 @@
 {% endblock %}
 
 {% block body %}
-
+<div class="row">
+    <div class="col">
+        <div class="h3">Status: {{delivery.status}}</div>        
+        <div class="h3">Total: {{delivery.purchase.total_price}}</div>        
+        <div class="h3">Placed on: {{delivery.created_date}}</div>        
+        {% if delivery.delivered_date is not None %}
+            <div class="h3">Placed on {{delivery.delivered_date}}</div>
+        {% endif %}
+        <div class="h3">Order items:</div>        
+        {% for purchase_item in delivery.purchase.purchase_items.all %}
+            <div class="h3">
+                {{purchase_item.product_name}} x {{purchase_item.quantity}}
+            </div>
+            <div class="h3">
+                {{purchase_item.price_at_purchase}}
+            </div>
+        {% endfor %}
+    </div>
+    <div class="col">
+        <div class="h3">{{delivery.city}}</div>
+        <div class="h3">{{delivery.street}} - {{delivery.street_number}}</div>
+        <div class="h3">{{delivery.phone_number}}</div>
+    </div>
+</div>
 {% endblock %}
 

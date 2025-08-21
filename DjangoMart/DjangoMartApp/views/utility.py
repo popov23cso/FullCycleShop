@@ -1,7 +1,16 @@
 from django.db.models import F
 from django.shortcuts import render
-from .models import CartItem, ShoppingCart, Purchase, PurchaseItem, Product
+from ..models import CartItem, ShoppingCart
+from datetime import datetime
+from rest_framework.pagination import PageNumberPagination
 
+
+class ApiPagination(PageNumberPagination):
+    page_size = 50
+
+    # the users can pass ?page_size=X (X<=100) to get more results per page 
+    page_size_query_param = "page_size" 
+    max_page_size = 100
 
 def add_product_to_cart(user, product, quantity):
     cart, created = ShoppingCart.objects.get_or_create(user_id=user)
@@ -21,35 +30,15 @@ def product_has_enough_stock(product, quantity):
         return True 
     return False
 
-
 def render_django_mart_app(request, template_name, context=None):
     if context is None:
         context = {}
     full_template_name = f'DjangoMartApp/{template_name}.html'
     return render(request, full_template_name, context)
 
-def create_user_purchase(user):
-    cart = ShoppingCart.objects.get(user_id=user)
-    cart_items = cart.cart_items.all().select_related('product')
+def parse_date(date):
+    try:
+        return datetime.fromisoformat(date)
+    except (TypeError, ValueError):
+        return None
 
-    purchase = Purchase.objects.create(
-                    user=user,
-                    total_price=calculate_total_cart_price(cart_items)
-                )
-
-    for item in cart_items:
-        PurchaseItem.objects.create(
-            purchase=purchase,
-            product_name=item.product.name,
-            price_at_purchase=item.product.price,
-            quantity=item.quantity
-        )
-
-    cart_items.delete()
-
-def calculate_total_cart_price(cart_items):
-    total_price = 0
-    for item in cart_items:
-        total_price += item.product.price
-    
-    return total_price

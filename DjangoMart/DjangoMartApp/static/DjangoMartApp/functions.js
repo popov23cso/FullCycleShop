@@ -43,10 +43,11 @@ export function show_element(selector) {
   element.style.display = 'block';
 }
 
-export async function send_api_request(url, request_body) {
+export async function send_api_request(url, request_body, request_method) {
     try {
         const response = await fetch(url, {
-            method: 'PUT',
+            method: request_method,
+            credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': getCSRFToken(),

@@ -1,0 +1,16 @@
+{
+    "sources": [
+        {
+            "name": "djangomart",
+            "base_url": "http://127.0.0.1:8000/",
+            "objects": 
+            [
+                {
+                    "name": "get_purchases",
+                    "last_ingestion_dtt": "2025-01-01 11:20:09.227018"
+                }
+            ]
+        }
+    ]
+
+}

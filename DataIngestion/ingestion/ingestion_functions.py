@@ -1,43 +1,95 @@
-import pandas
-import sqlite3
-from pathlib import Path
-import json
+import requests
+import duckdb
 import datetime
+from pathlib import Path 
 import pandas as pd
 
-def ingest_sqlite3_data(metadata_file_name):
-    metadata_path = Path(__file__).resolve().parent.parent / 'metadata' / metadata_file_name
-    if not metadata_path.exists():
-        raise FileNotFoundError(f'Metadata file not found at {metadata_path}')
+def get_djangomart_auth_tokens(username, password):
+    token_url = 'http://127.0.0.1:8000/api/token/'
+    request_body = {
+        'username':username,
+        'password':password
+    }
+    try:
+        response = requests.post(token_url, json=request_body)
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        raise RuntimeError(f"Error while requesting token server: {e}")
     
-    metadata = None
-    with open(metadata_path, 'r') as metadata_file:
-        metadata = json.load(metadata_file)
-
-    db_path = Path(__file__).resolve().parent.parent.parent / 'DjangoMart' / metadata['database_name']
-    if not db_path.exists():
-        raise FileNotFoundError(f'Database file not found at {db_path}')
+    data = response.json()
+    if 'access' not in data or 'refresh' not in data:
+        raise ValueError(f"Unexpected response format while retrieving auth tokens: {data}")
     
-    ingestion_start_dtt = datetime.datetime.now()
+    return data['refresh'], data['access']
+
+
+def refresh_access_token(refresh_token):
+    token_url = 'http://127.0.0.1:8000/api/token/refresh/'
+    request_body = {
+        'refresh':refresh_token,
+    }
+    try:
+        response = requests.post(token_url, json=request_body)
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        raise RuntimeError(f"Error while requesting access token from token server: {e}")
     
-    db_connection = sqlite3.connect(db_path)
+    data = response.json()
+    if 'access' not in data:
+        raise ValueError(f"Unexpected response format while retrieving access token: {data}")
+    
+    return data['access']
 
-    for i, table in enumerate(metadata['tables']):
-        ingest_sqlite3_table(table, db_connection, ingestion_start_dtt)
-        metadata['tables'][i]['last_ingestion_dtt'] = str(ingestion_start_dtt)
+def get_djangomart_data(access_token, refresh_token, endpoint, updated_after):
+    base_url = 'http://127.0.0.1:8000/'
+    full_url = base_url + endpoint    
+    params = {
+        'updated_after': updated_after
+    }
 
-    with open(metadata_path, 'w') as metadata_file:
-        json.dump(metadata, metadata_file, indent=4)
-    db_connection.close()
+    all_data = []
 
+    while full_url is not None:    
+        headers = {
+            "Authorization": f"Bearer {access_token}"
+        }
 
-def ingest_sqlite3_table(table, db_connection, ingestion_start_dtt):
-    query = f"SELECT * FROM {table['name']} WHERE last_modified_date > '{table['last_ingestion_dtt']}'"
-    df = pd.read_sql_query(query, db_connection)
-    if len(df) > 0:
-        file_name = table['name'] + '_' + ingestion_start_dtt.strftime('%Y%m%d%H%M%S') + '.parquet'
+        try:
+            response = requests.get(full_url, headers=headers, params=params)
+            
+            if response.status_code == 401:
+                try: 
+                    access_token = refresh_access_token(refresh_token)
+                except ValueError as e: 
+                    raise RuntimeError(f'Error while requesting a new access token: {e}')
+                
+                continue
+
+            response.raise_for_status()
+        except requests.exceptions.RequestException as e:
+            raise RuntimeError(f"Error while requesting {endpoint} data: {e}")
         
-        file_path = Path(__file__).resolve().parent.parent.parent / 'DataLake' / 'SQLite3' / table['name'] / file_name
-        df.to_parquet(file_path, engine='pyarrow', index=False)
+        response_data = response.json()
+        if response_data['success']:
+            df = pd.DataFrame(response_data['data']['results'])
+            all_data.append(df)
+        else:
+            return None 
+        
+        full_url = response_data['data']['next']
+        
+    current_datetime = datetime.datetime.now()
+    current_datetime = current_datetime.strftime('%Y%m%d%H%M%S')
+    file_name = endpoint + '_' + current_datetime + '.parquet'
+    current_dir = Path.cwd()
+    file_path = current_dir.parents[1] / "DataLake" / "DjangoMart" / file_name
 
-ingest_sqlite3_data('tables.json')
+    # duckdb cannot read directly in memory python objects so an intermediate step is needed
+    df = pd.concat(all_data, ignore_index=True)
+    with duckdb.connect() as con:
+        con.register("object_data", df)
+        con.execute(
+            f"COPY (SELECT * FROM object_data) TO '{file_path}' (FORMAT PARQUET)"
+        )
+
+    return file_name

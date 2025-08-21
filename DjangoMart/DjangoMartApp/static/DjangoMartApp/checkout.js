@@ -1,4 +1,4 @@
-import { getCSRFToken, toast_background, display_toast, hide_element, show_element, send_api_request} from './functions.js';
+import { toast_background, display_toast, hide_element, show_element, send_api_request} from './functions.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('#saveAddressBtn').addEventListener('click', save_address);
@@ -36,7 +36,7 @@ async function save_address() {
             street_number: street_number,
             phone_number: phone_number
     }
-    const response_data = await send_api_request('/add_address', request_body)
+    const response_data = await send_api_request('/add_address', request_body, 'POST')
     if (response_data.error) {
         display_toast('Error!', response_data.error, toast_background.ERROR);
     } else {
@@ -59,7 +59,7 @@ async function remove_address(parent_element, address_id) {
     const request_body = {
                 address_id: address_id
     }
-    const response_data = await send_api_request('/remove_address', request_body);
+    const response_data = await send_api_request('/remove_address', request_body, 'DELETE');
     if (response_data.error) {
         display_toast('Error!', response_data.error, toast_background.ERROR);
     } else {
