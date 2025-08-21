@@ -1,13 +1,16 @@
 from ..models import (Product, ShoppingCart, CartItem, 
                      DeliveryDestination, Purchase)
 from .utility import  (product_has_enough_stock, add_product_to_cart, parse_date,
-                       ApiPagination, PurchaseSerializer)
+                       ApiPagination)
+
+from .serializers import PurchaseSerializer, CustomTokenObtainPairSerializer
 
 from django.forms.models import model_to_dict
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -146,3 +149,7 @@ def get_purchases(request):
         "data": purchases
     },
     status=status.HTTP_200_OK)
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer

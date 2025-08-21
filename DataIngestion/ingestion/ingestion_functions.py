@@ -3,7 +3,6 @@ import duckdb
 import datetime
 from pathlib import Path 
 import pandas as pd
-from api_secrets import DJANGOMART_PASSWORD, DJANGOMART_USERNAME
 
 def get_djangomart_auth_tokens(username, password):
     token_url = 'http://127.0.0.1:8000/api/token/'
@@ -94,6 +93,3 @@ def get_djangomart_data(access_token, refresh_token, endpoint, updated_after):
         )
 
     return file_name
-
-refresh, access = get_djangomart_auth_tokens(DJANGOMART_USERNAME, DJANGOMART_PASSWORD)
-get_djangomart_data(access, refresh, 'get_purchases', '2025-01-01')

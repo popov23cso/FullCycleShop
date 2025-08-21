@@ -1,15 +1,9 @@
 from django.db.models import F
 from django.shortcuts import render
-from ..models import CartItem, ShoppingCart, Purchase
+from ..models import CartItem, ShoppingCart
 from datetime import datetime
 from rest_framework.pagination import PageNumberPagination
-from rest_framework import serializers
 
-
-class PurchaseSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Purchase
-        fields = "__all__" 
 
 class ApiPagination(PageNumberPagination):
     page_size = 50
