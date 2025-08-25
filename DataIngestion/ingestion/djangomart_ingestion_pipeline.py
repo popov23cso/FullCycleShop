@@ -31,27 +31,33 @@ metadata_file_path = current_dir.parents[0] / 'metadata' / metadata_file_name
 with open(metadata_file_path, 'r') as metadata_file:
     metadata = json.load(metadata_file)
 
+
 for i, source in enumerate(metadata['sources']):
     source_name = source['name']
     if source_name == 'djangomart':
         batch_datetime = datetime.datetime.now().strftime('%Y-%m-%d %H%M%S')
         logger.info('Starting ingestion for djangomart batch %s', batch_datetime)
         for j, obj in enumerate(source['objects']):
-            logger.info('Starting ingestion for %s object', obj)
+            endpoint_name = obj['name']
+            delta_dtt = obj['last_ingestion_dtt']
+
+            logger.info('Starting ingestion for %s object', endpoint_name)
+
             try:
                 refresh_token, access_token = get_djangomart_auth_tokens(DJANGOMART_USERNAME, DJANGOMART_PASSWORD)
             except Exception:
                 logger.exception('Exception occured during retrieval of auth tokens for user %s', DJANGOMART_USERNAME)
 
-            endpoint_name = obj['name']
-            delta_dtt = obj['last_ingestion_dtt']
-
             try:
                 get_djangomart_data(access_token, refresh_token, endpoint_name, delta_dtt)
-                logger.info('Succesfully ingested %s object', obj)
-                metadata['sources'][i]['objects'][j] = batch_datetime
+                logger.info('Succesfully ingested %s object', endpoint_name)
+                object_metadata = {
+                    'name': endpoint_name,
+                    'last_ingestion_dtt': batch_datetime
+                }
+                metadata['sources'][i]['objects'][j] = object_metadata
             except Exception:
-                logger.exception('Exception occured during ingestion of %s data', endpoint_name)
+                logger.exception('Exception occured during ingestion of %s object', endpoint_name)
 
 
 # save updated timestamps

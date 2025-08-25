@@ -80,9 +80,13 @@ def get_djangomart_data(access_token, refresh_token, endpoint, updated_after):
         
     current_datetime = datetime.datetime.now()
     current_datetime = current_datetime.strftime('%Y%m%d%H%M%S')
-    file_name = endpoint + '_' + current_datetime + '.parquet'
+    file_name = endpoint.upper() + '_' + current_datetime + '.parquet'
     current_dir = Path.cwd()
-    file_path = current_dir.parents[1] / "DataLake" / "DjangoMart" / file_name
+
+    folder_path = Path(current_dir.parents[1] / "DataLake" / "DjangoMart" / endpoint.upper())
+    folder_path.mkdir(parents=True, exist_ok=True)
+
+    file_path = folder_path / file_name
 
     # duckdb cannot read directly in memory python objects so an intermediate step is needed
     df = pd.concat(all_data, ignore_index=True)
