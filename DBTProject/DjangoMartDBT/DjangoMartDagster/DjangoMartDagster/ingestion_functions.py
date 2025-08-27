@@ -27,7 +27,7 @@ logger.addHandler(file_handler)
 
 # TODO - Replace current logging with dagster logging
 
-PROJECT_NAME = 'DagsterOrchestration'
+PROJECT_NAME = 'DjangoMartDagster'
 
 def get_djangomart_auth_tokens(username, password):
     token_url = 'http://127.0.0.1:8000/api/token/'
@@ -127,7 +127,7 @@ def get_djangomart_data(access_token, refresh_token, endpoint, updated_after):
 def ingest_djangomart_data(endpoint_name, batch_datetime):
     current_dir = Path.cwd()
     metadata_file_name = 'django_mart_tables.json'
-    metadata_file_path = current_dir / 'src' / PROJECT_NAME / 'metadata' / metadata_file_name
+    metadata_file_path = current_dir / 'metadata' /  metadata_file_name
 
     with open(metadata_file_path, 'r') as metadata_file:
         metadata = json.load(metadata_file)
