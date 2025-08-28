@@ -108,7 +108,7 @@ def get_djangomart_data(access_token, refresh_token, endpoint, updated_after):
     file_name = endpoint.upper() + '_' + current_datetime + '.parquet'
     current_dir = Path.cwd()
 
-    folder_path = Path(current_dir.parents[0] / "DataLake" / "DjangoMart" / endpoint.upper())
+    folder_path = Path(current_dir.parents[2] / "DataLake" / "DjangoMart" / endpoint.upper())
     folder_path.mkdir(parents=True, exist_ok=True)
 
     file_path = folder_path / file_name
@@ -127,7 +127,7 @@ def get_djangomart_data(access_token, refresh_token, endpoint, updated_after):
 def ingest_djangomart_data(endpoint_name, batch_datetime):
     current_dir = Path.cwd()
     metadata_file_name = 'django_mart_tables.json'
-    metadata_file_path = current_dir / 'metadata' /  metadata_file_name
+    metadata_file_path = current_dir / PROJECT_NAME /'metadata' /  metadata_file_name
 
     with open(metadata_file_path, 'r') as metadata_file:
         metadata = json.load(metadata_file)

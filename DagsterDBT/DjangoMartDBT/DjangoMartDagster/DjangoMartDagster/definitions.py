@@ -1,11 +1,11 @@
 from dagster import Definitions
 from dagster_dbt import DbtCliResource
-from .assets import DjangoMartDBT_dbt_assets, djangomart_purchases, batch_datetime_resource
+from .assets import DjangoMartDBT_dbt_assets, raw_purchases, batch_datetime_resource
 from .project import DjangoMartDBT_project
 from .schedules import schedules, daily_djangomart_schedule
 
 defs = Definitions(
-    assets=[DjangoMartDBT_dbt_assets, djangomart_purchases],
+    assets=[DjangoMartDBT_dbt_assets, raw_purchases],
     resources={
         'dbt': DbtCliResource(project_dir=DjangoMartDBT_project),
         'batch_datetime_resource': batch_datetime_resource

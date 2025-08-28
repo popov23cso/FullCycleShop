@@ -10,7 +10,6 @@ import datetime
 def DjangoMartDBT_dbt_assets(context: AssetExecutionContext, dbt: DbtCliResource):
     yield from dbt.cli(["build"], context=context).stream()
 
-
 @resource()
 def batch_datetime_resource(_):
     return datetime.datetime.now().strftime('%Y-%m-%d %H%M%S')
@@ -20,8 +19,9 @@ def batch_datetime_resource(_):
         required_resource_keys={'batch_datetime_resource'},
         group_name='djangomart_api_objects'
         )
-def djangomart_purchases(context):
+def raw_purchases(context):
     endpoint_name = 'get_purchases'
     return ingest_djangomart_data(endpoint_name, context.resources.batch_datetime_resource)
+
 
     
