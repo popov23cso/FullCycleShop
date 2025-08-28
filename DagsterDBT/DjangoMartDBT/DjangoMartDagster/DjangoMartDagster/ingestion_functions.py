@@ -3,29 +3,9 @@ import duckdb
 import datetime
 from pathlib import Path 
 import pandas as pd
-import logging
 from .api_secrets import DJANGOMART_USERNAME, DJANGOMART_PASSWORD
 import json
-
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-
-console_handler = logging.StreamHandler()
-file_handler = logging.FileHandler('djangomart_log.log', mode='a')
-
-console_handler.setLevel(logging.DEBUG)
-file_handler.setLevel(logging.DEBUG)
-
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-console_handler.setFormatter(formatter)
-file_handler.setFormatter(formatter)
-
-# add custom handlers to logger
-logger.addHandler(console_handler)
-logger.addHandler(file_handler)
-
-# TODO - Replace current logging with dagster logging
+from dagster import Failure
 
 PROJECT_NAME = 'DjangoMartDagster'
 
@@ -103,28 +83,30 @@ def get_djangomart_data(access_token, refresh_token, endpoint, updated_after):
         
         full_url = response_data['data']['next']
         
-    current_datetime = datetime.datetime.now()
-    current_datetime = current_datetime.strftime('%Y%m%d%H%M%S')
-    file_name = endpoint.upper() + '_' + current_datetime + '.parquet'
-    current_dir = Path.cwd()
-
-    folder_path = Path(current_dir.parents[2] / "DataLake" / "DjangoMart" / endpoint.upper())
-    folder_path.mkdir(parents=True, exist_ok=True)
-
-    file_path = folder_path / file_name
-
-    # duckdb cannot read directly in memory python objects so an intermediate step is needed
     df = pd.concat(all_data, ignore_index=True)
-    with duckdb.connect() as con:
-        con.register("object_data", df)
-        con.execute(
-            f"COPY (SELECT * FROM object_data) TO '{file_path}' (FORMAT PARQUET)"
-        )
+    if len(df) > 0:
+        current_datetime = datetime.datetime.now()
+        current_datetime = current_datetime.strftime('%Y%m%d%H%M%S')
+        file_name = endpoint.upper() + '_' + current_datetime + '.parquet'
+        current_dir = Path.cwd()
 
-    return file_name
+        folder_path = Path(current_dir.parents[2] / "DataLake" / "DjangoMart" / endpoint.upper())
+        folder_path.mkdir(parents=True, exist_ok=True)
+
+        file_path = folder_path / file_name
+
+        # duckdb cannot read directly in memory python objects so an intermediate step is needed
+        with duckdb.connect() as con:
+            con.register("object_data", df)
+
+            con.execute(
+                f"COPY (SELECT * FROM object_data) TO '{file_path}' (FORMAT PARQUET)"
+            )
+
+        return file_name
 
 
-def ingest_djangomart_data(endpoint_name, batch_datetime):
+def ingest_djangomart_data(endpoint_name, batch_datetime, log):
     current_dir = Path.cwd()
     metadata_file_name = 'django_mart_tables.json'
     metadata_file_path = current_dir / PROJECT_NAME /'metadata' /  metadata_file_name
@@ -134,19 +116,19 @@ def ingest_djangomart_data(endpoint_name, batch_datetime):
 
     delta_dtt = metadata[endpoint_name]['last_ingestion_dtt']
 
-    logger.info('Starting ingestion for %s object', endpoint_name)
+    log.info(f'Starting ingestion for {endpoint_name} object')
 
     try:
         refresh_token, access_token = get_djangomart_auth_tokens(DJANGOMART_USERNAME, DJANGOMART_PASSWORD)
     except Exception:
-        logger.exception('Exception occured during retrieval of auth tokens for user %s', DJANGOMART_USERNAME)
+        raise Failure(description=f'Exception occured during retrieval of auth tokens for user {DJANGOMART_USERNAME}')
 
     try:
         get_djangomart_data(access_token, refresh_token, endpoint_name, delta_dtt)
-        logger.info('Succesfully ingested %s object', endpoint_name)
+        log.info(f'Succesfully ingested {endpoint_name} object')
         metadata[endpoint_name]['last_ingestion_dtt'] = batch_datetime
     except Exception:
-        logger.exception('Exception occured during ingestion of %s object', endpoint_name)
+        raise Failure(f'Exception occured during ingestion of {endpoint_name} object')
 
 
     # save updated timestamps

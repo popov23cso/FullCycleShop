@@ -21,7 +21,7 @@ def batch_datetime_resource(_):
         )
 def raw_purchases(context):
     endpoint_name = 'get_purchases'
-    return ingest_djangomart_data(endpoint_name, context.resources.batch_datetime_resource)
+    return ingest_djangomart_data(endpoint_name, context.resources.batch_datetime_resource, context.log)
 
 
     
