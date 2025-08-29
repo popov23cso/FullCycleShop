@@ -6,6 +6,8 @@ from .utility import  (product_has_enough_stock, add_product_to_cart, parse_date
 from .serializers import PurchaseSerializer, CustomTokenObtainPairSerializer
 
 from django.forms.models import model_to_dict
+from django.utils.dateparse import parse_datetime
+from django.utils import timezone
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -130,11 +132,12 @@ def get_purchases(request):
              status=status.HTTP_400_BAD_REQUEST)
     
     filter_date = updated_after if updated_after is not None else created_after
+
+    # when no timezone is provided by the user default to the server default timezone 
+    if timezone.is_naive(filter_date):
+        filter_date = timezone.make_aware(filter_date)
     
-    if updated_after is not None:
-        purchases = Purchase.objects.filter(updated_date__gte=filter_date)
-    else:
-        purchases = Purchase.objects.filter(created_after__gte=filter_date)
+    purchases = Purchase.objects.filter(updated_date__gte=filter_date).order_by('updated_date')
 
     paginator = ApiPagination()
     results_page = paginator.paginate_queryset(purchases, request)

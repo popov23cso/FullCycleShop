@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: djangomart
+    tables:
+      - name: dummy_model
+        meta:
+          dagster:
+            asset_key: ['raw_purchases']
