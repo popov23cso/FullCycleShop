@@ -1,4 +1,3 @@
-{% macro read_djangomart_folder(folder_name) %}
-    {% set base_folder_path = '' %}
-    SELECT * FROM 'path/to/folder/*.parquet'
+{% macro read_data_lake_folder(folder_path) %}
+    SELECT * FROM '{{ var("DATA_LAKE_PATH") ~ folder_path ~ "/*.parquet"}}'
 {% endmacro %}
