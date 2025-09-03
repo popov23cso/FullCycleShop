@@ -35,13 +35,11 @@ clean-targets:         # directories to be removed by `dbt clean`
 # files using the `{{ config(...) }}` macro.
 models:
   DjangoMartDBT:
-    # Config indicated by + and applies to all files under models/example/
-    # example:
-    #   +materialized: view
-    example:
+    bronze:
+      +schema: bronze
       +materialized: table
-    example2:
-      +schema: stg
+    silver:
+      +schema: silver
       +materialized: table
       
 

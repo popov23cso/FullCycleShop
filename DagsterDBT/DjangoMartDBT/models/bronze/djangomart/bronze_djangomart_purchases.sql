@@ -1,6 +1,6 @@
-with dummy_dagster_relation as 
+WITH dummy_dagster_relation AS 
 (
-    select * from {{ source('djangomart', 'dummy_model') }}
+    SELECT * FROM {{ source('djangomart', 'dummy_model') }}
 )
 
 {{ read_data_lake_folder('DJANGOMART/GET_PURCHASES')}}
