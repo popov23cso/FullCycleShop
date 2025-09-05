@@ -2,12 +2,14 @@
 version: 2
 
 models:
-  - name: my_first_dbt_model
-    description: "A starter dbt model"
+  - name: raw_djangomart_purchases
+    description: "Purchase data coming from the djangomart source system"
     columns:
       - name: id
         description: "The primary key for this table"
         tests:
-          - unique
-          - not_null
+          - unique:
+              arguments: {}
+          - not_null:
+              arguments: {}
 
