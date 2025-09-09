@@ -6,7 +6,8 @@ from .views.web import (homepage_view, login_view, register,
                     delivery )
 
 from .views.api import (add_to_cart, remove_from_cart, add_address,
-                  remove_address, get_purchases, CustomTokenObtainPairView)
+                    remove_address, get_purchases, CustomTokenObtainPairView,
+                    get_purchase_items)
 
 from rest_framework_simplejwt.views import (
     TokenRefreshView
@@ -31,6 +32,7 @@ urlpatterns = [
     path('add_address', add_address, name='add_address'),
     path('remove_address', remove_address, name='remove_address'),
     path('get_purchases', get_purchases, name='get_purchases'),
+    path('get_purchase_items', get_purchase_items, name='get_purchase_items'),
 
     # Token based authentication
     path('api/token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),

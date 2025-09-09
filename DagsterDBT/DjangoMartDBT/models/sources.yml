@@ -6,4 +6,4 @@ sources:
       - name: dummy_model
         meta:
           dagster:
-            asset_key: ['raw_purchases']
+            asset_key: ['get_purchases']

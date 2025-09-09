@@ -1,1 +1,0 @@
-select * from {{ref('bronze_djangomart_purchases')}}

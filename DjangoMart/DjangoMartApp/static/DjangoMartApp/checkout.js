@@ -91,6 +91,7 @@ function display_address(city, street, street_number, phone_number, id) {
     street_num_el.textContent = street_number;
     phone_num_el.textContent = phone_number;
     delete_btn.dataset.id = id;
+    card.dataset.id = id;
 
     card.addEventListener('click',() => select_address(card));
 
