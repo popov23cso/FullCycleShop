@@ -1,6 +1,9 @@
 from django.contrib import admin
 
-from .models import User, Category, Product, Brand, CartItem, ShoppingCart, DeliveryDestination, DeliveryTracking, Purchase, PurchaseItem
+from .models import (User, Category, Product,
+                    Brand, CartItem, ShoppingCart,
+                    DeliveryDestination, DeliveryTracking, Purchase, 
+                    PurchaseItem)
 
 # Register your models here.
 

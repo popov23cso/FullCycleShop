@@ -98,7 +98,7 @@ class Product(models.Model):
     price = models.FloatField(validators=[MinValueValidator(1.0)])
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
     stock = models.PositiveIntegerField(validators=[MinValueValidator(1)])
-    rating = models.FloatField(blank=True, null=True)
+    rating = models.FloatField(default=0)
     rating_count = models.IntegerField(default=0)
     sales_count = models.IntegerField(default=0)
     categories = models.ManyToManyField(Category)
@@ -148,6 +148,7 @@ class PurchaseItem(models.Model):
     price_at_purchase = models.FloatField()
     quantity = models.PositiveIntegerField()
     created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
 
 
 
