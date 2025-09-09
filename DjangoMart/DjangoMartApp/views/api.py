@@ -1,13 +1,12 @@
 from ..models import (Product, ShoppingCart, CartItem, 
-                     DeliveryDestination, Purchase)
+                     DeliveryDestination, Purchase, PurchaseItem)
 from .utility import  (product_has_enough_stock, add_product_to_cart, parse_date,
-                       ApiPagination)
+                       ApiPagination, validate_api_date_parameters)
 
-from .serializers import PurchaseSerializer, CustomTokenObtainPairSerializer
+from .serializers import (PurchaseSerializer, CustomTokenObtainPairSerializer,
+                          PurchaseItemSerializer)
 
 from django.forms.models import model_to_dict
-from django.utils.dateparse import parse_datetime
-from django.utils import timezone
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -113,46 +112,51 @@ def remove_address(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_purchases(request):
-    updated_after = parse_date(request.GET.get('updated_after'))
-    created_after = parse_date(request.GET.get('created_after'))
+    success, response = validate_api_date_parameters(request.GET.get('created_after'), request.GET.get('updated_after'))
 
-    if updated_after is not None and created_after is not None:
-        return Response(
-            {
-                'success':False,
-                'error': 'Created_after and updated_after cannot be passed at the same time'
-            },
-            status=status.HTTP_400_BAD_REQUEST)
-    elif updated_after is None and created_after is None:
-        return Response(
-            {
-                'success':False,
-                'error': 'Supplying updated_after or created_after parameter is required. Passed dates need to be in valid ISO 8601 format'
-            }, 
-             status=status.HTTP_400_BAD_REQUEST)
-    
-    filter_date = updated_after if updated_after is not None else created_after
+    if not success:
+        return response
+    filter_date = response
 
-    # when no timezone is provided by the user default to the server default timezone 
-    if timezone.is_naive(filter_date):
-        filter_date = timezone.make_aware(filter_date)
-    
     purchases = Purchase.objects.filter(updated_date__gte=filter_date).order_by('updated_date')
-
     paginator = ApiPagination()
     results_page = paginator.paginate_queryset(purchases, request)
     serializer = PurchaseSerializer(results_page, many=True)
 
     # get only the response data instead of the entire Response object
-    purchases = paginator.get_paginated_response(serializer.data).data
+    purchases_data = paginator.get_paginated_response(serializer.data).data
 
     return Response(
     {
         "success": True,
-        "data": purchases
+        "data": purchases_data
     },
     status=status.HTTP_200_OK)
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_purchase_items(request):
+    success, response = validate_api_date_parameters(request.GET.get('created_after'), request.GET.get('updated_after'))
+
+    if not success:
+        return response
+    filter_date = response
+
+    purchase_items = PurchaseItem.objects.filter(updated_date__gte=filter_date).order_by('updated_date')
+    paginator = ApiPagination()
+    results_page = paginator.paginate_queryset(purchase_items, request)
+    serializer = PurchaseItemSerializer(results_page, many=True)
+
+    # get only the response data instead of the entire Response object
+    purchase_items_data = paginator.get_paginated_response(serializer.data).data
+
+    return Response(
+    {
+        "success": True,
+        "data": purchase_items_data
+    },
+    status=status.HTTP_200_OK)

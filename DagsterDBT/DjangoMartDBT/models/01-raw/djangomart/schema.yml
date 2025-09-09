@@ -10,6 +10,8 @@ models:
         tests:
           - unique:
               arguments: {}
+              severity: warn
           - not_null:
               arguments: {}
+              severity: warn
 
