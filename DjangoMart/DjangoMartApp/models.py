@@ -40,7 +40,9 @@ class DeliveryTracking(models.Model):
         CANCELLED = 'Cancelled'
 
     delivery_destination = models.ForeignKey(DeliveryDestination,
-                                            on_delete=models.DO_NOTHING, 
+                                            on_delete=models.SET_NULL, 
+                                            null=True,
+                                            blank=True,
                                             related_name='delivery_tracking')
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     city = models.CharField(max_length=100)
