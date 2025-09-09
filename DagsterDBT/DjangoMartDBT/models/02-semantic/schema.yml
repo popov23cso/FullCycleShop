@@ -1,6 +1,7 @@
 
 version: 2
 
+
 models:
   - name: semantic_djangomart_purchases
     description: |
@@ -21,6 +22,12 @@ models:
               severity: warn
       - name: IS_INVALID
         description: "Flags invalid records"
+      - name: USER
+        description: "The id of the user who made the purchase, coming from the source system"
+        tests:
+          - not_null:
+              arguments: {}
+              severity: warn
       - name: CREATED_DATE
         description: "Datetime in which the record was inserted"
         tests:
@@ -29,11 +36,54 @@ models:
               severity: warn
       - name: UPDATED_DATE
         description: "Datetime in which a record was last modified"
-      - name: USER
-        description: "The id of the user who made the purchase, coming from the source system"
+  - name: semantic_djangomart_purchase_items
+    description: |
+     Purchase items data coming from the djangomart source system with
+     its columns clearly and consistenly named and its types casted
+    columns:
+      &columns_common
+      - name: ID
+        description: "The primary key for this table"
+        tests:
+          - not_null:
+              arguments: {}
+              severity: error
+      - name: PRODUCT_NAME
+        description: "The name of the product"
+        tests:
+          - not_null:
+              arguments: {}
+              severity: warn 
+      - name: PRODUCT_ID
+        description: "The foreign key referencing product"
+        tests:
+          - not_null:
+              arguments: {}
+              severity: warn 
+      - name: PRICE_AT_PURCHASE
+        description: "The price of one unit of this item at the time of purchase"
+        tests:
+          - not_null:
+              arguments: {}
+              severity: warn 
+      - name: QUANTITY
+        description: "How many of this products were purchased"
+        tests:
+          - not_null:
+              arguments: {}
+              severity: warn 
+      - name: PURCHASE_ID
+        description: "The foreign key referencing purchase"
+        tests:
+          - not_null:
+              arguments: {}
+              severity: warn 
+      - name: CREATED_DATE
+        description: "Datetime in which the record was inserted"
         tests:
           - not_null:
               arguments: {}
               severity: warn
-      
+      - name: UPDATED_DATE
+        description: "Datetime in which a record was last modified"
 

@@ -14,4 +14,16 @@ models:
           - not_null:
               arguments: {}
               severity: warn
+  - name: raw_djangomart_purchase_items
+    description: "Purchase item data coming from the djangomart source system. Contains items that are a part of each purchase"
+    columns:
+      - name: id
+        description: "The primary key for this table"
+        tests:
+          - unique:
+              arguments: {}
+              severity: warn
+          - not_null:
+              arguments: {}
+              severity: warn
 
