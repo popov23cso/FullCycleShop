@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.exceptions import AuthenticationFailed
-from ..models import Purchase, PurchaseItem
+from ..models import Purchase, PurchaseItem, Product
 
 class PurchaseSerializer(serializers.ModelSerializer):
     class Meta:
@@ -11,6 +11,11 @@ class PurchaseSerializer(serializers.ModelSerializer):
 class PurchaseItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = PurchaseItem
+        fields = '__all__' 
+
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
         fields = '__all__' 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):

@@ -1,11 +1,13 @@
 from django.db.models import F
 from django.shortcuts import render
-from ..models import CartItem, ShoppingCart
 from datetime import datetime
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework import status
 from django.utils import timezone
+from .serializers import (PurchaseSerializer, PurchaseItemSerializer, ProductSerializer)
+from ..models import (Product, ShoppingCart, CartItem, 
+                      Purchase, PurchaseItem)
 
 
 class ApiPagination(PageNumberPagination):
@@ -63,12 +65,33 @@ def validate_api_date_parameters(created_after, updated_after):
             },
             status=status.HTTP_400_BAD_REQUEST)
         
-        return False, validation_response
+        return False, validation_response, None
     
     filter_date = updated_after if updated_after is not None else created_after
+    filter_column_meta = {}
+    filter_column_meta['column_name'] = 'updated_date' if updated_after is not None else 'created_date'
+    filter_column_meta['column_condition'] = 'updated_date__gte' if updated_after is not None else 'created_date__gte'
+
 
     # when no timezone is provided by the user default to the server default timezone 
     if timezone.is_naive(filter_date):
         filter_date = timezone.make_aware(filter_date)
         
-    return True, filter_date
+    return True, filter_date, filter_column_meta
+
+def serialize_model_data(data, request):
+    paginator = ApiPagination()
+    results_page = paginator.paginate_queryset(data, request)
+
+    if isinstance(data, Purchase):
+        serializer = PurchaseSerializer(results_page, many=True)
+    elif isinstance(data, PurchaseItem):
+        serializer = PurchaseItemSerializer(results_page, many=True)
+    if isinstance(data, Product):
+        serializer = ProductSerializer(results_page, many=True)
+    else:
+        raise ValueError(f'Model instance with no defined serialized passed: {data._meta.model_name}')
+
+    # get only the response data instead of the entire Response object
+    paginated_data = paginator.get_paginated_response(serializer.data).data
+    return paginated_data
