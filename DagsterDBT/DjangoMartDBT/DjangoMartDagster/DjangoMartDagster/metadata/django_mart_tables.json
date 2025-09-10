@@ -3,6 +3,9 @@
         "last_ingestion_dtt": "2025-09-03 171941"
     },
     "get_purchase_items": {
-        "last_ingestion_dtt": "2025-09-09 171303"
+        "last_ingestion_dtt": "2025-09-10 173104"
+    },
+    "get_products": {
+        "last_ingestion_dtt": "2025-09-10 172933"
     }
 }
