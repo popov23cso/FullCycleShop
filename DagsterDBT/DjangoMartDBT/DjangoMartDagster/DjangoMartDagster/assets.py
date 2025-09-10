@@ -31,5 +31,13 @@ def get_purchase_items(context):
     endpoint_name = 'get_purchase_items'
     return ingest_djangomart_data(endpoint_name, context.resources.batch_datetime_resource, context.log)
 
+@asset(
+        required_resource_keys={'batch_datetime_resource'},
+        group_name='djangomart_api_objects'
+        )
+def get_products(context):
+    endpoint_name = 'get_products'
+    return ingest_djangomart_data(endpoint_name, context.resources.batch_datetime_resource, context.log)
+
 
     
