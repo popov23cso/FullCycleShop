@@ -10,7 +10,8 @@ created_date: &created_date
   tests:
     - not_null:
         arguments: {}
-        severity: warn
+        config:
+          severity: warn
 
 models:
   - name: semantic_djangomart_purchases
@@ -23,13 +24,15 @@ models:
         tests:
           - not_null:
               arguments: {}
-              severity: error
+              config:
+                severity: error
       - name: TOTAL_PRICE
         description: "Total price paid by user at checkout"
         tests:
           - not_null:
               arguments: {}
-              severity: warn
+              config:
+                severity: warn
       - name: IS_INVALID
         description: "Flags invalid records"
       - name: USER
@@ -37,7 +40,8 @@ models:
         tests:
           - not_null:
               arguments: {}
-              severity: warn
+              config:
+                severity: warn
       - *created_date
       - *updated_date
   - name: semantic_djangomart_purchase_items
@@ -50,37 +54,43 @@ models:
         tests:
           - not_null:
               arguments: {}
-              severity: error
+              config:
+                severity: error
       - name: PRODUCT_NAME
         description: "The name of the product"
         tests:
           - not_null:
               arguments: {}
-              severity: warn 
+              config:
+                severity: warn 
       - name: PRODUCT_ID
         description: "The foreign key referencing product"
         tests:
           - not_null:
               arguments: {}
-              severity: warn 
+              config:
+                severity: warn 
       - name: PRICE_AT_PURCHASE
         description: "The price of one unit of this item at the time of purchase"
         tests:
           - not_null:
               arguments: {}
-              severity: warn 
+              config:
+                severity: warn 
       - name: QUANTITY
         description: "How many of this products were purchased"
         tests:
           - not_null:
               arguments: {}
-              severity: warn 
+              config:
+                severity: warn 
       - name: PURCHASE_ID
         description: "The foreign key referencing purchase"
         tests:
           - not_null:
               arguments: {}
-              severity: warn 
+              config:
+                severity: warn 
       - *created_date
       - *updated_date
 

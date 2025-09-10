@@ -10,7 +10,8 @@ models:
         tests:
           - not_null:
               arguments: {}
-              severity: warn
+              config:
+                severity: warn
   - name: raw_djangomart_purchase_items
     description: "Purchase item data coming from the djangomart source system. Contains items that are a part of each purchase"
     columns:
@@ -19,7 +20,8 @@ models:
         tests:
           - not_null:
               arguments: {}
-              severity: warn
+              config:
+                severity: warn
   - name: raw_djangomart_products
     description: "Product data coming from the djangomart source system."
     columns:
@@ -28,5 +30,6 @@ models:
         tests:
           - not_null:
               arguments: {}
-              severity: warn
+              config:
+                severity: warn
 
