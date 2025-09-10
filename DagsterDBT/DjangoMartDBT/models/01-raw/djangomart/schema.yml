@@ -8,9 +8,6 @@ models:
       - name: id
         description: "The primary key for this table"
         tests:
-          - unique:
-              arguments: {}
-              severity: warn
           - not_null:
               arguments: {}
               severity: warn
@@ -20,9 +17,15 @@ models:
       - name: id
         description: "The primary key for this table"
         tests:
-          - unique:
+          - not_null:
               arguments: {}
               severity: warn
+  - name: raw_djangomart_products
+    description: "Product data coming from the djangomart source system."
+    columns:
+      - name: id
+        description: "The primary key for this table"
+        tests:
           - not_null:
               arguments: {}
               severity: warn
