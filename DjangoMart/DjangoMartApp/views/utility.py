@@ -1,4 +1,4 @@
-from django.db.models import F
+from django.db.models import F, QuerySet
 from django.shortcuts import render
 from datetime import datetime
 from rest_framework.pagination import PageNumberPagination
@@ -80,17 +80,20 @@ def validate_api_date_parameters(created_after, updated_after):
     return True, filter_date, filter_column_meta
 
 def serialize_model_data(data, request):
+    if not isinstance(data, QuerySet):
+        raise ValueError(f"Expected a QuerySet, got {type(data).__name__}")
+
     paginator = ApiPagination()
     results_page = paginator.paginate_queryset(data, request)
 
-    if isinstance(data, Purchase):
+    if data.model is Purchase:
         serializer = PurchaseSerializer(results_page, many=True)
-    elif isinstance(data, PurchaseItem):
+    elif data.model is PurchaseItem:
         serializer = PurchaseItemSerializer(results_page, many=True)
-    if isinstance(data, Product):
+    elif data.model is Product:
         serializer = ProductSerializer(results_page, many=True)
     else:
-        raise ValueError(f'Model instance with no defined serialized passed: {data._meta.model_name}')
+        raise ValueError(f'Model instance with no defined serialized passed: {data.model._meta.model_name }')
 
     # get only the response data instead of the entire Response object
     paginated_data = paginator.get_paginated_response(serializer.data).data
