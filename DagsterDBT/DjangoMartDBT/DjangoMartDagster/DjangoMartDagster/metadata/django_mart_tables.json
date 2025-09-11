@@ -7,5 +7,8 @@
     },
     "get_products": {
         "last_ingestion_dtt": "2025-09-11 115143"
+    },
+    "get_users": {
+        "last_ingestion_dtt": "2025-09-11 170353"
     }
 }
