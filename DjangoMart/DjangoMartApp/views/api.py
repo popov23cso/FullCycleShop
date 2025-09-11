@@ -125,3 +125,8 @@ def get_purchase_items(request):
 @permission_classes([IsAuthenticated])
 def get_products(request):
     return get_standart_api_model_data(request, 'Product')
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_users(request):
+    return get_standart_api_model_data(request, 'User')

@@ -5,9 +5,10 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework import status
 from django.utils import timezone
-from .serializers import (PurchaseSerializer, PurchaseItemSerializer, ProductSerializer)
+from .serializers import (PurchaseSerializer, PurchaseItemSerializer, ProductSerializer,
+                          UserSerializer)
 from ..models import (Product, ShoppingCart, CartItem, 
-                      Purchase, PurchaseItem)
+                      Purchase, PurchaseItem, User)
 from django.apps import apps
 
 
@@ -93,6 +94,8 @@ def serialize_model_data(data, request):
         serializer = PurchaseItemSerializer(results_page, many=True)
     elif data.model is Product:
         serializer = ProductSerializer(results_page, many=True)
+    elif data.model is User:
+        serializer = UserSerializer(results_page, many=True)
     else:
         raise ValueError(f'Model instance with no defined serialized passed: {data.model._meta.model_name }')
 
