@@ -12,20 +12,21 @@ created_date: &created_date
         arguments: {}
         config:
           severity: warn
-
+id: &id
+  name: ID 
+  description: "The primary key for this table"
+  tests:
+    - not_null:
+        arguments: {}
+        config:
+          severity: error
 models:
   - name: semantic_djangomart_purchases
     description: |
      Purchase data coming from the djangomart source system with
      its columns clearly and consistenly named and its types casted
     columns:
-      - name: ID
-        description: "The primary key for this table"
-        tests:
-          - not_null:
-              arguments: {}
-              config:
-                severity: error
+      - *id
       - name: TOTAL_PRICE
         description: "Total price paid by user at checkout"
         tests:
@@ -49,13 +50,7 @@ models:
      Purchase items data coming from the djangomart source system with
      its columns clearly and consistenly named and its types casted
     columns:
-      - name: ID
-        description: "The primary key for this table"
-        tests:
-          - not_null:
-              arguments: {}
-              config:
-                severity: error
+      - *id
       - name: PRODUCT_NAME
         description: "The name of the product"
         tests:
@@ -93,5 +88,106 @@ models:
                 severity: warn 
       - *created_date
       - *updated_date
-
-
+  - name: semantic_djangomart_products
+    description: |
+     Product data coming from the djangomart source system with
+     its columns clearly and consistenly named and its types casted
+    columns:
+      - *id
+      - name: TITLE
+        description: "The title of the product"
+        tests:
+          - not_null:
+              arguments: {}
+              config:
+                severity: warn 
+      - name: DESCRIPTION
+        description: "The description of the product"
+        tests:
+          - not_null:
+              arguments: {}
+              config:
+                severity: warn 
+      - name: PRICE
+        description: "The price of the product"
+        tests:
+          - not_null:
+              arguments: {}
+              config:
+                severity: warn 
+      - name: STOCK
+        description: "The stock available for the product"
+      - name: RATING
+        description: "The average rating of the product"
+      - name: SALES_COUNT
+        description: "The number of units sold"
+      - name: PRODUCT_WEIGHT
+        description: "The weight of the product"
+      - name: PRODUCT_HEIGHT
+        description: "The height of the product. If no unit of measure is specified assume centimeters"
+      - name: PRODUCT_WIDTH
+        description: "The width of the product. If no unit of measure is specified assume centimeters"
+      - name: PRODUCT_LENGTH
+        description: "The length of the product. If no unit of measure is specified assume centimeters"
+      - name: PACKAGE_WEIGHT
+        description: "The weight of the package"
+      - name: PACKAGE_HEIGHT
+        description: "The height of the package. If no unit of measure is specified assume centimeters"
+      - name: PACKAGE_WIDTH
+        description: "The width of the package. If no unit of measure is specified assume centimeters"
+      - name: PACKAGE_LENGTH
+        description: "The length of the package. If no unit of measure is specified assume centimeters"
+      - name: WARRANTY
+        description: "Warranty offered in months"
+      - name: IS_ACTIVE
+        description: "Flag indicating if the product is currently offered"
+      - name: BRAND
+        description: "Brand of the product"
+      - name: CATEGORIES
+        description: "List of categories to which product belongs"
+      - *created_date
+      - *updated_date
+  - name: semantic_djangomart_users
+    description: |
+     User data coming from the djangomart source system with
+     its columns clearly and consistenly named and its types casted
+    columns:
+      - *id
+      - name: LAST_LOGIN
+        description: "When has the user last logged in"
+      - name: IS_SUPERUSER
+        description: "Flags users with superuser permissions"
+      - name: USERNAME
+        description: "Username of the user"
+        tests:
+          - not_null:
+              arguments: {}
+              config:
+                severity: warn
+      - name: EMAIL
+        description: "Email of the user"
+        tests:
+          - not_null:
+              arguments: {}
+              config:
+                severity: warn
+      - name: IS_STAFF
+        description: "Flags users that are part of site staff"
+      - name: IS_ACTIVE
+        description: "Flags users which are active"
+      - name: DATE_JOINED
+        description: "Datetime at which the user was first registered at the site"
+      - name: FIRST_NAME
+        description: "First name of the user"
+      - name: LAST_NAME
+        description: "Last name of the user"
+      - name: PHONE_NUMBER
+        description: "Phone number of the user"
+      - name: TOTAL_PURCHASED_AMOUNT
+        description: "Total tokens spent on purchases through the site"
+      - name: IS_DELTED
+        description: "Flags deleted users"
+      - name: IS_API_USER
+        description: "Flags users which have api permissions"
+      - *created_date
+      - *updated_date
