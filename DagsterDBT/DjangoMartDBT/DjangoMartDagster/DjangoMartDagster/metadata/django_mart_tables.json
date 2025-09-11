@@ -1,11 +1,11 @@
 {
     "get_purchases": {
-        "last_ingestion_dtt": "2025-09-03 171941"
+        "last_ingestion_dtt": "2024-09-03 171941"
     },
     "get_purchase_items": {
-        "last_ingestion_dtt": "2025-09-10 173104"
+        "last_ingestion_dtt": "2025-09-11 115144"
     },
     "get_products": {
-        "last_ingestion_dtt": "2025-09-10 172933"
+        "last_ingestion_dtt": "2025-09-11 115143"
     }
 }
