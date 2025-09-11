@@ -1,7 +1,7 @@
 from ..models import (Product, ShoppingCart, CartItem, 
                      DeliveryDestination, Purchase, PurchaseItem)
 from .utility import  (product_has_enough_stock, add_product_to_cart,
-                       validate_api_date_parameters, serialize_model_data)
+                       get_standart_api_model_data)
 
 from .serializers import CustomTokenObtainPairSerializer
 
@@ -114,65 +114,14 @@ def remove_address(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_purchases(request):
-    success, response, filter_column_meta = validate_api_date_parameters(request.GET.get('created_after'), request.GET.get('updated_after'))
-
-    if not success:
-        return response
-    filter_date = response
-
-    purchases = Purchase.objects.filter(
-        **{filter_column_meta['column_condition']: filter_date}
-        ).order_by(filter_column_meta['column_name'])
-    
-    purchases_data = serialize_model_data(purchases, request)
-
-    return Response(
-    {
-        "success": True,
-        "data": purchases_data
-    },
-    status=status.HTTP_200_OK)
+    return get_standart_api_model_data(request, 'Purchase')
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_purchase_items(request):
-    success, response, filter_column_meta = validate_api_date_parameters(request.GET.get('created_after'), request.GET.get('updated_after'))
-
-    if not success:
-        return response
-    filter_date = response
-
-    purchase_items = PurchaseItem.objects.filter(
-        **{filter_column_meta['column_condition']: filter_date}
-        ).order_by(filter_column_meta['column_name'])
-    
-    purchase_items_data = serialize_model_data(purchase_items, request)
-
-    return Response(
-    {
-        "success": True,
-        "data": purchase_items_data
-    },
-    status=status.HTTP_200_OK)
+    return get_standart_api_model_data(request, 'PurchaseItem')
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_products(request):
-    success, response, filter_column_meta = validate_api_date_parameters(request.GET.get('created_after'), request.GET.get('updated_after'))
-
-    if not success:
-        return response
-    filter_date = response
-
-    products = Product.objects.filter(
-        **{filter_column_meta['column_condition']: filter_date}
-        ).order_by(filter_column_meta['column_name'])
-    
-    products_data = serialize_model_data(products, request)
-
-    return Response(
-    {
-        "success": True,
-        "data": products_data
-    },
-    status=status.HTTP_200_OK)
+    return get_standart_api_model_data(request, 'Product')
