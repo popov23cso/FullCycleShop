@@ -1,29 +1,60 @@
 
 version: 2
 
+id: &id
+  name: id
+  description: "The primary key for this table"
+  tests:
+    - not_null:
+        arguments: {}
+        config:
+          severity: warn
+dwh_file_path: &dwh_file_path
+  name: DWH_FILE_PATH
+  description: "The path to the file which contains the row of data"
+  tests:
+    - not_null:
+        arguments: {}
+        config:
+          severity: warn
+dwh_batch_datetime: &dwh_batch_datetime
+  name: DWH_BATCH_DATETIME
+  description: "The datetime in which the batch of data containing this row was ingested"
+  tests:
+    - not_null:
+        arguments: {}
+        config:
+          severity: warn
+
 models:
   - name: raw_djangomart_purchases
     description: "Purchase data coming from the djangomart source system"
     columns:
-      - name: id
-        description: "The primary key for this table"
-        tests:
-          - unique:
-              arguments: {}
-              severity: warn
-          - not_null:
-              arguments: {}
-              severity: warn
+      - *id
+      - *dwh_file_path
+      - *dwh_batch_datetime
   - name: raw_djangomart_purchase_items
     description: "Purchase item data coming from the djangomart source system. Contains items that are a part of each purchase"
     columns:
-      - name: id
-        description: "The primary key for this table"
-        tests:
-          - unique:
-              arguments: {}
-              severity: warn
-          - not_null:
-              arguments: {}
-              severity: warn
+      - *id
+      - *dwh_file_path
+      - *dwh_batch_datetime
+  - name: raw_djangomart_products
+    description: "Product data coming from the djangomart source system."
+    columns:
+      - *id
+      - *dwh_file_path
+      - *dwh_batch_datetime
+  - name: raw_djangomart_users
+    description: "User data coming from the djangomart source system."
+    columns:
+      - *id
+      - *dwh_file_path
+      - *dwh_batch_datetime
+  - name: raw_djangomart_categories
+    description: "Product category data coming from the djangomart source system."
+    columns:
+      - *id
+      - *dwh_file_path
+      - *dwh_batch_datetime
 

@@ -1,10 +1,9 @@
 from ..models import (Product, ShoppingCart, CartItem, 
                      DeliveryDestination, Purchase, PurchaseItem)
-from .utility import  (product_has_enough_stock, add_product_to_cart, parse_date,
-                       ApiPagination, validate_api_date_parameters)
+from .utility import  (product_has_enough_stock, add_product_to_cart,
+                       get_standart_api_model_data)
 
-from .serializers import (PurchaseSerializer, CustomTokenObtainPairSerializer,
-                          PurchaseItemSerializer)
+from .serializers import CustomTokenObtainPairSerializer
 
 from django.forms.models import model_to_dict
 from rest_framework.decorators import api_view, permission_classes
@@ -12,6 +11,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_simplejwt.views import TokenObtainPairView
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -112,51 +114,24 @@ def remove_address(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_purchases(request):
-    success, response = validate_api_date_parameters(request.GET.get('created_after'), request.GET.get('updated_after'))
-
-    if not success:
-        return response
-    filter_date = response
-
-    purchases = Purchase.objects.filter(updated_date__gte=filter_date).order_by('updated_date')
-    paginator = ApiPagination()
-    results_page = paginator.paginate_queryset(purchases, request)
-    serializer = PurchaseSerializer(results_page, many=True)
-
-    # get only the response data instead of the entire Response object
-    purchases_data = paginator.get_paginated_response(serializer.data).data
-
-    return Response(
-    {
-        "success": True,
-        "data": purchases_data
-    },
-    status=status.HTTP_200_OK)
-
-
-class CustomTokenObtainPairView(TokenObtainPairView):
-    serializer_class = CustomTokenObtainPairSerializer
+    return get_standart_api_model_data(request, 'Purchase')
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_purchase_items(request):
-    success, response = validate_api_date_parameters(request.GET.get('created_after'), request.GET.get('updated_after'))
+    return get_standart_api_model_data(request, 'PurchaseItem')
 
-    if not success:
-        return response
-    filter_date = response
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_products(request):
+    return get_standart_api_model_data(request, 'Product')
 
-    purchase_items = PurchaseItem.objects.filter(updated_date__gte=filter_date).order_by('updated_date')
-    paginator = ApiPagination()
-    results_page = paginator.paginate_queryset(purchase_items, request)
-    serializer = PurchaseItemSerializer(results_page, many=True)
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_users(request):
+    return get_standart_api_model_data(request, 'User')
 
-    # get only the response data instead of the entire Response object
-    purchase_items_data = paginator.get_paginated_response(serializer.data).data
-
-    return Response(
-    {
-        "success": True,
-        "data": purchase_items_data
-    },
-    status=status.HTTP_200_OK)
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_categories(request):
+    return get_standart_api_model_data(request, 'Category')

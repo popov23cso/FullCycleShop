@@ -1,8 +1,18 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.exceptions import AuthenticationFailed
-from ..models import Purchase, PurchaseItem
+from ..models import (Purchase, PurchaseItem, Product, 
+                      User, Category)
 
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+
+        if not self.user.is_api_user:
+            raise AuthenticationFailed('User not a part of API program. Please contact support to request access.')
+
+        return data
+    
 class PurchaseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Purchase
@@ -13,11 +23,18 @@ class PurchaseItemSerializer(serializers.ModelSerializer):
         model = PurchaseItem
         fields = '__all__' 
 
-class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    def validate(self, attrs):
-        data = super().validate(attrs)
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = '__all__' 
 
-        if not self.user.is_api_user:
-            raise AuthenticationFailed('User not a part of API program. Please contact support to request access.')
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        exclude = ('slug')
 
-        return data
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        exclude = ('password', 'user_permissions', 'delivery_details_provided_count',
+                    'groups')

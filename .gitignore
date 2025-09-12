@@ -4,6 +4,5 @@ __pycache__/
 api_secrets.py
 dbt.log
 DataLake/
-migrations/
 djangomart_log.log
 helper_data.txt

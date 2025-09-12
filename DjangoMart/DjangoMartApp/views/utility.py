@@ -1,11 +1,16 @@
-from django.db.models import F
+from django.db.models import F, QuerySet
 from django.shortcuts import render
-from ..models import CartItem, ShoppingCart
 from datetime import datetime
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework import status
 from django.utils import timezone
+from .serializers import (PurchaseSerializer, PurchaseItemSerializer, ProductSerializer,
+                          UserSerializer, CategorySerializer)
+from ..models import (Product, ShoppingCart, CartItem, 
+                      Purchase, PurchaseItem, User,
+                      Category)
+from django.apps import apps
 
 
 class ApiPagination(PageNumberPagination):
@@ -63,12 +68,63 @@ def validate_api_date_parameters(created_after, updated_after):
             },
             status=status.HTTP_400_BAD_REQUEST)
         
-        return False, validation_response
+        return False, validation_response, None
     
     filter_date = updated_after if updated_after is not None else created_after
+    filter_column_meta = {}
+    filter_column_meta['column_name'] = 'updated_date' if updated_after is not None else 'created_date'
+    filter_column_meta['column_condition'] = 'updated_date__gte' if updated_after is not None else 'created_date__gte'
+
 
     # when no timezone is provided by the user default to the server default timezone 
     if timezone.is_naive(filter_date):
         filter_date = timezone.make_aware(filter_date)
         
-    return True, filter_date
+    return True, filter_date, filter_column_meta
+
+def serialize_model_data(data, request):
+    if not isinstance(data, QuerySet):
+        raise ValueError(f"Expected a QuerySet, got {type(data).__name__}")
+
+    paginator = ApiPagination()
+    results_page = paginator.paginate_queryset(data, request)
+
+    if data.model is Purchase:
+        serializer = PurchaseSerializer(results_page, many=True)
+    elif data.model is PurchaseItem:
+        serializer = PurchaseItemSerializer(results_page, many=True)
+    elif data.model is Product:
+        serializer = ProductSerializer(results_page, many=True)
+    elif data.model is User:
+        serializer = UserSerializer(results_page, many=True)
+    elif data.model is Category:
+        serializer = CategorySerializer(results_page, many=True)
+    else:
+        raise ValueError(f'Model instance with no defined serialized passed: {data.model._meta.model_name }')
+
+    # get only the response data instead of the entire Response object
+    paginated_data = paginator.get_paginated_response(serializer.data).data
+    return paginated_data
+
+def get_standart_api_model_data(request, model_name):
+    django_app_name = 'DjangoMartApp' 
+    model = apps.get_model(django_app_name, model_name)
+
+    success, response, filter_column_meta = validate_api_date_parameters(request.GET.get('created_after'), request.GET.get('updated_after'))
+
+    if not success:
+        return response
+    filter_date = response
+
+    model_queryset = model.objects.filter(
+        **{filter_column_meta['column_condition']: filter_date}
+        ).order_by(filter_column_meta['column_name'])
+    
+    model_data = serialize_model_data(model_queryset, request)
+
+    return Response(
+    {
+        "success": True,
+        "data": model_data
+    },
+    status=status.HTTP_200_OK)

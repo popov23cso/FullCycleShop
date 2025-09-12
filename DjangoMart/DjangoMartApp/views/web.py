@@ -42,13 +42,16 @@ def cart_view(request):
 @login_required
 def checkout(request):
     if request.method == 'GET':
+
         delivery_destinations = DeliveryDestination.objects.filter(user=request.user)
         available_tokens = request.user.available_tokens
         cart = ShoppingCart.objects.get(user_id=request.user)
         cart_total_value = cart.total_value()
+
         delivery_details_provided_count = request.user.delivery_details_provided_count
         balance_after_purchase = available_tokens - cart_total_value
         can_afford_cart = balance_after_purchase >= 0
+
         return render_django_mart_app(request, 'checkout', {
             'available_tokens': available_tokens,
             'cart_total_value': cart_total_value,
@@ -57,6 +60,7 @@ def checkout(request):
             'can_afford_cart': can_afford_cart,
             'balance_after_purchase': balance_after_purchase
         })
+    
     elif request.method == 'POST':
         # if anything fails roll back all changes
         with transaction.atomic():
@@ -103,6 +107,7 @@ def checkout(request):
             cart.empty_cart()
             for item in cart_items:
                 item.product.stock -= item.quantity
+                item.product.sales_count += item.quantity
             Product.objects.bulk_update([item.product for item in cart_items], ['stock'])
 
             request.user.total_purchased_amount += total_value
