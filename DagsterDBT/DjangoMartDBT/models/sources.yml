@@ -25,3 +25,9 @@ sources:
         meta:
           dagster:
             asset_key: ['get_users']
+  - name: djangomart_categories
+    tables:
+      - name: dummy
+        meta:
+          dagster:
+            asset_key: ['get_categories']

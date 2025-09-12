@@ -47,5 +47,13 @@ def get_users(context):
     endpoint_name = 'get_users'
     return ingest_djangomart_data(endpoint_name, context.resources.batch_datetime_resource, context.log)
 
+@asset(
+        required_resource_keys={'batch_datetime_resource'},
+        group_name='djangomart_api_objects'
+        )
+def get_categories(context):
+    endpoint_name = 'get_categories'
+    return ingest_djangomart_data(endpoint_name, context.resources.batch_datetime_resource, context.log)
+
 
     
