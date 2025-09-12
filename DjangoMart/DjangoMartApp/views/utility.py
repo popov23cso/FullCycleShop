@@ -6,9 +6,10 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.utils import timezone
 from .serializers import (PurchaseSerializer, PurchaseItemSerializer, ProductSerializer,
-                          UserSerializer)
+                          UserSerializer, CategorySerializer)
 from ..models import (Product, ShoppingCart, CartItem, 
-                      Purchase, PurchaseItem, User)
+                      Purchase, PurchaseItem, User,
+                      Category)
 from django.apps import apps
 
 
@@ -96,6 +97,8 @@ def serialize_model_data(data, request):
         serializer = ProductSerializer(results_page, many=True)
     elif data.model is User:
         serializer = UserSerializer(results_page, many=True)
+    elif data.model is Category:
+        serializer = CategorySerializer(results_page, many=True)
     else:
         raise ValueError(f'Model instance with no defined serialized passed: {data.model._meta.model_name }')
 

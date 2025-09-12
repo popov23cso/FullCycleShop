@@ -191,3 +191,26 @@ models:
         description: "Flags users which have api permissions"
       - *created_date
       - *updated_date
+  - name: semantic_djangomart_categories
+    description: |
+     Product category data coming from the djangomart source system with
+     its columns clearly and consistenly named and its types casted
+    columns:
+      - *id
+      - name: TITLE
+        description: "Title of the category"
+        tests:
+          - not_null:
+              arguments: {}
+              config:
+                severity: warn
+      - name: DESCRIPTION
+        description: "Description of the category"
+      - name: IS_MAIN_CATEGORY
+        description: "Flags weather a category is a main category (main categories have no parents)"  
+      - name: IS_ACTIVE
+        description: "Flags weather a category is actively shown in the site"
+      - name: PARENT_CATEGORY
+        description: "ID of the parent category if such is available"
+      - *created_date
+      - *updated_date
