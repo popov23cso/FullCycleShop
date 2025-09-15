@@ -18,8 +18,7 @@
     (
         SELECT
             r.*,
-            ROW_NUMBER() OVER (PARTITION BY {{id_column}} ORDER BY {{delta_column}} DESC) as row_rank,
-            REGEXP_REPLACE({{delta_column}}::STRING, '[^0-9]', '') AS delta_column_digits
+            ROW_NUMBER() OVER (PARTITION BY {{id_column}} ORDER BY {{delta_column}} DESC) as row_rank
         FROM {{ ref(relation_name) }} r
     )
     SELECT 

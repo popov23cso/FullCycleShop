@@ -1,3 +1,3 @@
 SELECT
     *
-FROM {{ ref('historic_djangomart_categories') }}
+FROM {{ ref('scd2_djangomart_categories') }}
