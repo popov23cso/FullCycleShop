@@ -8,7 +8,7 @@
             from length(filename) - 7 - 14
             for 13
         ) AS DWH_BATCH_DATETIME
-    FROM read_parquet('{{ var("DATA_LAKE_PATH") ~ folder_path ~ "/*.parquet"}}')
+    FROM read_parquet('{{ var("DATA_LAKE_PATH") ~ folder_path ~ "/*.parquet"}}', union_by_name => TRUE)
 {% endmacro %}
 
 
