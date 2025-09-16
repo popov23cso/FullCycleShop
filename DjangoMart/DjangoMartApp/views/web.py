@@ -16,7 +16,7 @@ def homepage_view(request):
 
 def category_view(request, category_slug):
     category = get_object_or_404(Category, slug=category_slug)
-    products = Paginator(Product.objects.filter(categories=category, is_active=True).order_by('-sales_count'), 20)
+    products = Paginator(Product.objects.filter(category=category, is_active=True).order_by('-sales_count'), 20)
     page_number = request.GET.get('page')
     products_page = products.get_page(page_number)
     return render_django_mart_app(request, 'category', {'products':products_page})

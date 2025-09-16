@@ -103,7 +103,10 @@ class Product(models.Model):
     rating = models.FloatField(default=0)
     rating_count = models.IntegerField(default=0)
     sales_count = models.IntegerField(default=0)
-    categories = models.ManyToManyField(Category)
+    category = models.ForeignKey(Category,
+                                on_delete=models.SET_NULL,
+                                null=True,
+                                blank=True)
     product_weight = models.CharField(max_length=50, blank=True, null=True)
     product_height = models.CharField(max_length=50, blank=True, null=True)
     product_width = models.CharField(max_length=50, blank=True, null=True)
