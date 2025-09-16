@@ -1,3 +1,3 @@
 SELECT
     *
-FROM {{ ref('historic_djangomart_purchase_items') }}
+FROM {{ ref('integrated_djangomart_purchase_items') }}
