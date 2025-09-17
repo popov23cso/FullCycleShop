@@ -22,7 +22,7 @@
         FROM {{ ref(relation_name) }} r
 
         {% IF is_incremental() %}
-        -- only pull new/changed rows
+            -- only pull new/changed rows
             WHERE DWH_BATCH_DATETIME > COALESCE((SELECT max(DWH_BATCH_DATETIME) FROM {{ this }}), {{var('BEGINNING_OF_TIME')}})
         {% endif %}
     )

@@ -47,13 +47,14 @@ models:
       +unique_key: DWH_SK
     04-dimensioned:
       +schema: dimensioned
-      +materialized: table
+      +materialized: incremental
+      +unique_key: DWH_SK
     05-product:
       +schema: product
       +materialized: table
     06-modeled:
       +schema: modeled
-      +materialized: table
+      +materialized: view
       
 
 vars:
