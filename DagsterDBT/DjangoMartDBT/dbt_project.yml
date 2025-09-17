@@ -40,15 +40,16 @@ models:
       +materialized: table
     02-semantic:
       +schema: semantic
-      +materialized: table
+      +materialized: view
     03-historic:
       +schema: historic
-      +materialized: table
+      +materialized: incremental
+      +unique_key: DWH_SK
     04-dimensioned:
       +schema: dimensioned
       +materialized: table
     05-product:
-      +schema: modeled
+      +schema: product
       +materialized: table
     06-modeled:
       +schema: modeled
