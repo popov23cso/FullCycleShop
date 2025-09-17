@@ -47,7 +47,10 @@ models:
     04-dimensioned:
       +schema: dimensioned
       +materialized: table
-    05-modeled:
+    05-product:
+      +schema: modeled
+      +materialized: table
+    06-modeled:
       +schema: modeled
       +materialized: table
       
