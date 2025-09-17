@@ -1,7 +1,6 @@
 from ..models import (Product, ShoppingCart, CartItem, 
-                     DeliveryDestination, Purchase, PurchaseItem)
-from .utility import  (product_has_enough_stock, add_product_to_cart,
-                       get_standart_api_model_data)
+                     DeliveryDestination, Review, PurchaseItem)
+from .utility import  product_has_enough_stock, add_product_to_cart
 
 from .serializers import CustomTokenObtainPairSerializer
 
@@ -111,27 +110,26 @@ def remove_address(request):
 
     return Response({'message': 'Address deleted successfully'}, status=status.HTTP_200_OK)
 
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def get_purchases(request):
-    return get_standart_api_model_data(request, 'Purchase')
+def add_rating(request):
+    purchase_item_id = request.data.get('purchase_item_id')
+    rating = request.data.get('rating')
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_purchase_items(request):
-    return get_standart_api_model_data(request, 'PurchaseItem')
+    if not all([purchase_item_id, rating]):
+        return Response({'error': 'Mandatory field not provided'}, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_products(request):
-    return get_standart_api_model_data(request, 'Product')
+    try:
+        purchase_item = PurchaseItem.objects.get(
+        user=request.user,
+        id=purchase_item_id
+    )
+    except PurchaseItem.DoesNotExist:
+        return Response({'error': 'No such purchase item exists for this user'}, status=status.HTTP_404_NOT_FOUND)
+    
+    review = Review.objects.get_or_create(purchase_item=purchase_item)
+    
+    review.rating = rating
+    review.save()
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_users(request):
-    return get_standart_api_model_data(request, 'User')
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_categories(request):
-    return get_standart_api_model_data(request, 'Category')
+    return Response({'message': 'Product rated succesfully'}, status=status.HTTP_200_OK)

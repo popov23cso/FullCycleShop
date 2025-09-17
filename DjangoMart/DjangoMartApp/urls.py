@@ -5,10 +5,11 @@ from .views.web import (homepage_view, login_view, register,
                     product_view, checkout, orders,
                     delivery )
 
-from .views.api import (add_to_cart, remove_from_cart, add_address,
-                    remove_address, get_purchases, CustomTokenObtainPairView,
-                    get_purchase_items, get_products, get_users,
-                    get_categories)
+from .views.internal_api import (add_to_cart, remove_from_cart, add_address,
+                    remove_address, CustomTokenObtainPairView)
+
+from .views.external_api import (get_purchases, get_purchase_items, get_products, 
+                                 get_users, get_categories)
 
 from rest_framework_simplejwt.views import (
     TokenRefreshView
