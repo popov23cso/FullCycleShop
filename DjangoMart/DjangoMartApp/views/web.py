@@ -82,7 +82,7 @@ def checkout(request):
                 PurchaseItem(
                     purchase=purchase,
                     product_name=item.product.title,
-                    product_id=item.product.id,
+                    product=item.product,
                     price_at_purchase=item.product.price,
                     quantity=item.quantity)
                 for item in cart_items
@@ -126,7 +126,7 @@ def delivery(request, delivery_id):
     try:
         delivery = (DeliveryTracking.objects
                     .select_related('purchase')
-                    .prefetch_related('purchase__purchase_items')
+                    .prefetch_related('purchase__purchase_items', 'purchase__purchase_items__review')
                     .get(user=request.user, id=delivery_id))
     except DeliveryTracking.DoesNotExist:
         return render_django_mart_app(request, 'error', {'message':'The requested delivery does not exist for this user'})
