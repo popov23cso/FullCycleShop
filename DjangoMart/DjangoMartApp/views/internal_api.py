@@ -5,6 +5,7 @@ from .utility import  product_has_enough_stock, add_product_to_cart
 from .serializers import CustomTokenObtainPairSerializer
 
 from django.forms.models import model_to_dict
+from django.core.exceptions import ValidationError
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -112,24 +113,34 @@ def remove_address(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def add_rating(request):
+def manage_review(request):
     purchase_item_id = request.data.get('purchase_item_id')
     rating = request.data.get('rating')
+    comment = request.data.get('comment')
 
     if not all([purchase_item_id, rating]):
         return Response({'error': 'Mandatory field not provided'}, status=status.HTTP_400_BAD_REQUEST)
+    rating = int(rating)
 
     try:
         purchase_item = PurchaseItem.objects.get(
-        user=request.user,
         id=purchase_item_id
     )
     except PurchaseItem.DoesNotExist:
         return Response({'error': 'No such purchase item exists for this user'}, status=status.HTTP_404_NOT_FOUND)
     
-    review = Review.objects.get_or_create(purchase_item=purchase_item)
-    
-    review.rating = rating
-    review.save()
+    if purchase_item.purchase.user != request.user:
+        return Response({'error': 'You can only rate your own purchase items'}, status=status.HTTP_404_NOT_FOUND)
+
+    try:
+        review, created = Review.objects.get_or_create(purchase_item=purchase_item,
+                                               rating=rating,
+                                               comment=comment)
+        if not created:
+            review.rating = rating 
+            review.comment = comment
+            review.save()
+    except ValidationError:
+        return Response({'error': 'Invalid value passed for rating'}, status=status.HTTP_400_BAD_REQUEST)
 
     return Response({'message': 'Product rated succesfully'}, status=status.HTTP_200_OK)

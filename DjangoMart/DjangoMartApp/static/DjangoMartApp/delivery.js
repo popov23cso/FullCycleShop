@@ -6,6 +6,10 @@ document.addEventListener('DOMContentLoaded', () => {
         star.addEventListener('click', e => {update_stars(e.currentTarget, stars)})
     })
 
+    const save_review_btns = document.querySelectorAll('#saveReviewBtn');
+    save_review_btns.forEach(btn => {
+        btn.addEventListener('click', e => {save_review(e.currentTarget)})
+    })
 })
 
 
@@ -18,4 +22,45 @@ function update_stars(target_star, all_stars) {
         s.classList.toggle('text-warning', is_active);
         s.classList.toggle('bi-star', !is_active);
     });
+}
+
+async function save_review(save_button) {
+    const purchase_item_id = save_button.dataset.itemid;
+    const star_group_id = `starGroup${purchase_item_id}`;
+    const rating = get_review_star_count(star_group_id);
+
+    if (rating <= 0) {
+        let error_mesage = 'Please select star rating'
+        display_toast('Error!', error_mesage, toast_background.ERROR);
+    }
+
+    const comment_id = `#comment${purchase_item_id}`;
+    const comment = document.querySelector(comment_id).value;
+
+    const request_body = {
+        purchase_item_id: purchase_item_id,
+        rating: rating,
+        comment: comment
+    }
+
+    const response_data = await send_api_request('/manage_review', request_body, 'POST');
+    
+    if (response_data.error) {
+        display_toast('Error!', response_data.error, toast_background.ERROR);
+    } else {
+        display_toast('Success!', response_data.message, toast_background.SUCCESS);
+    }
+}
+
+function get_review_star_count(star_group_id) {
+    const stars = document.querySelectorAll(`#${star_group_id}`);
+    let star_count = 0;
+
+    stars.forEach(star => {
+        if ( star.classList.contains('bi-star-fill') ) {
+            star_count += 1;
+        }
+    })
+
+    return star_count
 }

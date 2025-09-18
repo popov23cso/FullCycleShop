@@ -6,7 +6,7 @@ from .views.web import (homepage_view, login_view, register,
                     delivery )
 
 from .views.internal_api import (add_to_cart, remove_from_cart, add_address,
-                    remove_address, CustomTokenObtainPairView)
+                    remove_address, CustomTokenObtainPairView, manage_review)
 
 from .views.external_api import (get_purchases, get_purchase_items, get_products, 
                                  get_users, get_categories)
@@ -28,11 +28,14 @@ urlpatterns = [
     path('orders', orders, name='orders'),
     path('delivery/<int:delivery_id>', delivery, name='delivery'),
 
-    # API`s
+    # Internal API`s
     path('add_to_cart', add_to_cart, name='add_to_cart'),
     path('remove_from_cart', remove_from_cart, name='remove_from_cart'),
     path('add_address', add_address, name='add_address'),
     path('remove_address', remove_address, name='remove_address'),
+    path('manage_review', manage_review, name='manage_review'),
+
+    # External API`s`
     path('get_purchases', get_purchases, name='get_purchases'),
     path('get_purchase_items', get_purchase_items, name='get_purchase_items'),
     path('get_products', get_products, name='get_products'),
