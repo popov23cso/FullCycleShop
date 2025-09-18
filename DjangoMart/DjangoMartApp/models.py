@@ -172,3 +172,9 @@ class Review(models.Model):
     comment = models.TextField(blank=True, null=True)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        
+        # run model validation before saving
+        self.full_clean()  
+        super().save(*args, **kwargs)
