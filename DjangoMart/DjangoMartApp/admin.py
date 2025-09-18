@@ -3,7 +3,7 @@ from django.contrib import admin
 from .models import (User, Category, Product,
                     Brand, CartItem, ShoppingCart,
                     DeliveryDestination, DeliveryTracking, Purchase, 
-                    PurchaseItem)
+                    PurchaseItem, Review)
 
 # Register your models here.
 
@@ -17,3 +17,4 @@ admin.site.register(DeliveryDestination)
 admin.site.register(DeliveryTracking)
 admin.site.register(Purchase)
 admin.site.register(PurchaseItem)
+admin.site.register(Review)

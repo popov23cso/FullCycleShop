@@ -21,29 +21,49 @@
         {% endif %}
         <div class="h3">Order items:</div>        
         {% for purchase_item in delivery.purchase.purchase_items.all %}
-            <div class="h3">
-                {{purchase_item.product_name}} x {{purchase_item.quantity}}
-            </div>
-            <div class="h3">
-                {{purchase_item.price_at_purchase}}
-            </div>
-                {% if item.review %}
-                    {% for i in "12345"|make_list %}
-                        {% if forloop.counter <= item.review.rating %}
-                            <i class="bi bi-star-fill star" data-value="1"></i>
-                        {% else %}
-                            <i class="bi bi-star star" data-value="1"></i>
+            <div class="container border border-success border-1 rounded mb-3 p-3">
+                <div class="h3">
+                    {{purchase_item.product_name}} x {{purchase_item.quantity}}
+                </div>
+                <div class="h3">
+                    {{purchase_item.price_at_purchase}}
+                </div>
+                {% comment %}
+                {% if delivery.status == 'Delivered' %}
+                {% endcomment %}
+                    {% if purchase_item.review %}
+                        <div class="d-flex gap-2">
+                            {% for i in "12345"|make_list %}
+                                {% if forloop.counter <= purchase_item.review.rating %}
+                                    <i class="bi bi-star-fill text-warning star" id="starGroup{{purchase_item.id}}" data-value="{{forloop.counter}}"></i>
+                                {% else %}
+                                    <i class="bi bi-star star" id="starGroup{{purchase_item.id}}" data-value="{{forloop.counter}}"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <textarea class="form-control" id="comment{{purchase_item.id}}" rows="4" placeholder="Write your review here" disabled>
+                            {{ purchase_item.review.comment }}
+                        </textarea>
+                    {% else %}
+                        <div class="d-flex gap-2">
+                            <i class="bi bi-star star" id="starGroup{{purchase_item.id}}" data-value="1"></i>
+                            <i class="bi bi-star star" id="starGroup{{purchase_item.id}}" data-value="2"></i>
+                            <i class="bi bi-star star" id="starGroup{{purchase_item.id}}" data-value="3"></i>
+                            <i class="bi bi-star star" id="starGroup{{purchase_item.id}}" data-value="4"></i>
+                            <i class="bi bi-star star" id="starGroup{{purchase_item.id}}" data-value="5"></i>
+                        </div>
+                        <div class="mb-3">
+                        <label for="message" class="form-label">Review</label>
+                        <textarea class="form-control" id="comment{{purchase_item.id}}" rows="4" placeholder="Write your review here"></textarea>
+                        </div>
+                        <button type="button" class="btn btn-outline-success" id="saveReviewBtn" data-itemid="{{purchase_item.id}}">
+                            Save review
+                        </button>
                     {% endif %}
-                    {% endfor %}
-                {% else %}
-                    <div class="d-flex gap-2">
-                        <i class="bi bi-star star" data-value="1"></i>
-                        <i class="bi bi-star star" data-value="2"></i>
-                        <i class="bi bi-star star" data-value="3"></i>
-                        <i class="bi bi-star star" data-value="4"></i>
-                        <i class="bi bi-star star" data-value="5"></i>
-                    </div>
+                {% comment %}
                 {% endif %}
+                {% endcomment %}
+            </div>
         {% endfor %}
     </div>
     <div class="col">
