@@ -2,6 +2,8 @@
 
 {% load static %}
 
+{% load math_functions %}
+
 {% block styles %}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 {% endblock %}
@@ -23,15 +25,22 @@
         {% for purchase_item in delivery.purchase.purchase_items.all %}
             <div class="container border border-success border-1 rounded mb-3 p-3">
                 <div class="h3">
-                    {{purchase_item.product_name}} x {{purchase_item.quantity}}
+                    <a href="{% url 'product' purchase_item.product.id %}">{{purchase_item.product_name}} x {{purchase_item.quantity}}</a>
                 </div>
                 <div class="h3">
-                    {{purchase_item.price_at_purchase}}
+                    Price per item: {{purchase_item.price_at_purchase}} - total: {{ purchase_item.price_at_purchase|multiply:purchase_item.quantity }}
                 </div>
                 {% comment %}
                 {% if delivery.status == 'Delivered' %}
                 {% endcomment %}
                     {% if purchase_item.review %}
+                        Your review - 
+                        <button type="button" class="btn btn-outline-success btn-sm" data-reviewid="{{purchase_item.review.id}}">
+                            Edit review
+                        </button>
+                        <button type="button" class="btn btn-outline-danger btn-sm" id="deleteReviewBtn" data-reviewid="{{purchase_item.review.id}}">
+                            Delete review
+                        </button>
                         <div class="d-flex gap-2">
                             {% for i in "12345"|make_list %}
                                 {% if forloop.counter <= purchase_item.review.rating %}
@@ -44,6 +53,9 @@
                         <textarea class="form-control" id="comment{{purchase_item.id}}" rows="4" placeholder="Write your review here" disabled>
                             {{ purchase_item.review.comment }}
                         </textarea>
+                        <button type="button" class="btn btn-outline-success" id="saveReviewBtn" data-itemid="{{purchase_item.id}}" style="display: none">
+                            Save review
+                        </button>
                     {% else %}
                         <div class="d-flex gap-2">
                             <i class="bi bi-star star" id="starGroup{{purchase_item.id}}" data-value="1"></i>
