@@ -10,6 +10,11 @@ document.addEventListener('DOMContentLoaded', () => {
     save_review_btns.forEach(btn => {
         btn.addEventListener('click', e => {save_review(e.currentTarget)})
     })
+
+    const delete_review_btns = document.querySelectorAll('#deleteReviewBtn');
+    delete_review_btns.forEach(btn => {
+        btn.addEventListener('click', e => {delete_review(e.currentTarget)})
+    })
 })
 
 
@@ -48,7 +53,7 @@ async function save_review(save_button) {
     if (response_data.error) {
         display_toast('Error!', response_data.error, toast_background.ERROR);
     } else {
-        display_toast('Success!', response_data.message, toast_background.SUCCESS);
+        location.reload();
     }
 }
 
@@ -63,4 +68,20 @@ function get_review_star_count(star_group_id) {
     })
 
     return star_count
+}
+
+async function delete_review(delete_button) {
+    const review_id = delete_button.dataset.reviewid;
+
+    const request_body = {
+        review_id: review_id
+    }
+
+    const response_data = await send_api_request('/delete_review', request_body, 'DELETE');
+    
+    if (response_data.error) {
+        display_toast('Error!', response_data.error, toast_background.ERROR);
+    } else {
+        location.reload();
+    }
 }
