@@ -24,7 +24,15 @@ def category_view(request, category_slug):
 def product_view(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     product.description_html = markdown(product.description)
-    return render_django_mart_app(request, 'product', {'product':product})
+    reviews = product.review.all()[:5]
+    ratings = {}
+    average_rating = product.average_rating
+    ratings['average'] = average_rating
+    ratings['full_stars'] = int(average_rating)
+    ratings['half_star'] = average_rating != int(average_rating)
+    max_stars = 5
+    ratings['empty_stars'] = max_stars - ratings['full_stars'] - (1 if ratings['half_star'] else 0) 
+    return render_django_mart_app(request, 'product', {'product':product, 'reviews':reviews, 'ratings': ratings})
 
 @login_required
 def cart_view(request):
