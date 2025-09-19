@@ -169,6 +169,7 @@ class PurchaseItem(models.Model):
 class Review(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     purchase_item = models.OneToOneField('PurchaseItem', on_delete=models.CASCADE, related_name='review')
+    product = models.ForeignKey('Product', on_delete=models.CASCADE, related_name='review')
     rating = models.PositiveSmallIntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)])
     comment = models.TextField(blank=True, null=True)
     created_date = models.DateTimeField(auto_now_add=True)
@@ -179,3 +180,7 @@ class Review(models.Model):
         # run model validation before saving
         self.full_clean()  
         super().save(*args, **kwargs)
+
+    class Meta:
+        # always get revciews in descending order by created date
+        ordering = ["-created_date"]  
