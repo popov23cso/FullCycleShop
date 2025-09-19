@@ -21,5 +21,5 @@ SELECT
     updated_date::DATETIME AS UPDATED_DATE,
     is_active::BOOLEAN AS IS_ACTIVE,
     brand::STRING AS BRAND_ID,
-    categories::STRING AS CATEGORIES
+    category::STRING AS CATEGORY_ID
 FROM {{ref('raw_djangomart_products')}}

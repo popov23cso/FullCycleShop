@@ -16,7 +16,7 @@ def homepage_view(request):
 
 def category_view(request, category_slug):
     category = get_object_or_404(Category, slug=category_slug)
-    products = Paginator(Product.objects.filter(categories=category, is_active=True).order_by('-sales_count'), 20)
+    products = Paginator(Product.objects.filter(category=category, is_active=True).order_by('-sales_count'), 20)
     page_number = request.GET.get('page')
     products_page = products.get_page(page_number)
     return render_django_mart_app(request, 'category', {'products':products_page})
@@ -24,7 +24,15 @@ def category_view(request, category_slug):
 def product_view(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     product.description_html = markdown(product.description)
-    return render_django_mart_app(request, 'product', {'product':product})
+    reviews = product.review.all()[:5]
+    ratings = {}
+    average_rating = product.average_rating
+    ratings['average'] = average_rating
+    ratings['full_stars'] = int(average_rating)
+    ratings['half_star'] = average_rating != int(average_rating)
+    max_stars = 5
+    ratings['empty_stars'] = max_stars - ratings['full_stars'] - (1 if ratings['half_star'] else 0) 
+    return render_django_mart_app(request, 'product', {'product':product, 'reviews':reviews, 'ratings': ratings})
 
 @login_required
 def cart_view(request):
@@ -82,7 +90,7 @@ def checkout(request):
                 PurchaseItem(
                     purchase=purchase,
                     product_name=item.product.title,
-                    product_id=item.product.id,
+                    product=item.product,
                     price_at_purchase=item.product.price,
                     quantity=item.quantity)
                 for item in cart_items
@@ -126,7 +134,7 @@ def delivery(request, delivery_id):
     try:
         delivery = (DeliveryTracking.objects
                     .select_related('purchase')
-                    .prefetch_related('purchase__purchase_items')
+                    .prefetch_related('purchase__purchase_items', 'purchase__purchase_items__review')
                     .get(user=request.user, id=delivery_id))
     except DeliveryTracking.DoesNotExist:
         return render_django_mart_app(request, 'error', {'message':'The requested delivery does not exist for this user'})

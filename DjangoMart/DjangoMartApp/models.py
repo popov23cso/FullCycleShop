@@ -54,7 +54,7 @@ class DeliveryTracking(models.Model):
         choices=Status.choices,
         default=Status.COLLECTING,
     )
-    purchase = models.ForeignKey('Purchase', 
+    purchase = models.OneToOneField('Purchase', 
                                  on_delete=models.DO_NOTHING,
                                  related_name='delivery_tracking')
     created_date = models.DateTimeField(auto_now_add=True)
@@ -103,7 +103,10 @@ class Product(models.Model):
     rating = models.FloatField(default=0)
     rating_count = models.IntegerField(default=0)
     sales_count = models.IntegerField(default=0)
-    categories = models.ManyToManyField(Category)
+    category = models.ForeignKey(Category,
+                                on_delete=models.SET_NULL,
+                                null=True,
+                                blank=True)
     product_weight = models.CharField(max_length=50, blank=True, null=True)
     product_height = models.CharField(max_length=50, blank=True, null=True)
     product_width = models.CharField(max_length=50, blank=True, null=True)
@@ -119,9 +122,16 @@ class Product(models.Model):
 
     def __str__(self):
         return f'{self.title}'
+    
+    @property
+    def average_rating(self):
+
+        # get all related reviews through purchase items
+        reviews = Review.objects.filter(purchase_item__product_id=self.id)
+        return reviews.aggregate(avg=models.Avg('rating'))['avg'] or 0.0
 
 class ShoppingCart(models.Model):
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    user_id = models.OneToOneField(User, on_delete=models.CASCADE)
     total_items_count = models.PositiveIntegerField(default=0)
     def total_value(self):
         cart_items = self.cart_items.select_related('product')
@@ -146,11 +156,31 @@ class Purchase(models.Model):
 class PurchaseItem(models.Model):
     purchase = models.ForeignKey(Purchase, on_delete=models.DO_NOTHING, related_name='purchase_items')
     product_name = models.CharField(max_length=100)
-    product_id = models.CharField(max_length=200)
+    product = models.ForeignKey(Product,
+                                on_delete=models.SET_NULL,
+                                related_name='purchase_item',
+                                blank=True,
+                                null=True)
     price_at_purchase = models.FloatField()
     quantity = models.PositiveIntegerField()
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
 
+class Review(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    purchase_item = models.OneToOneField('PurchaseItem', on_delete=models.CASCADE, related_name='review')
+    product = models.ForeignKey('Product', on_delete=models.CASCADE, related_name='review')
+    rating = models.PositiveSmallIntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)])
+    comment = models.TextField(blank=True, null=True)
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
 
+    def save(self, *args, **kwargs):
+        
+        # run model validation before saving
+        self.full_clean()  
+        super().save(*args, **kwargs)
 
+    class Meta:
+        # always get revciews in descending order by created date
+        ordering = ["-created_date"]  

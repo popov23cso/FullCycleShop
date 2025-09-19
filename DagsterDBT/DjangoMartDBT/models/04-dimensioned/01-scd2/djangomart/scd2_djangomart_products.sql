@@ -1,0 +1,1 @@
+{{ star_schema_scd2('historic_djangomart_products', 'ID', 'UPDATED_DATE') }}

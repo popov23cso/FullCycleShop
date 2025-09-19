@@ -2,6 +2,10 @@
 
 {% load static %}
 
+{% block styles %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+{% endblock %}
+
 {% block title %}
     {{product.title}}
 {% endblock %}
@@ -9,8 +13,17 @@
 {% block body %}
     <div class="container">
         <h2>{{product.title}}</h2>
+        {% for _ in ""|center:ratings.full_stars %}
+            <i class="bi bi-star-fill text-warning star"></i>
+        {% endfor %}
+        {% if ratings.half_star %}
+            <i class="bi bi-star-half text-warning star"></i>
+        {% endif %}
+        {% for _ in ""|center:ratings.empty_stars %}
+            <i class="bi bi-star text-warning star"></i>
+        {% endfor %}
     </div>
-    <div class="container">
+    <div class="container mb-5">
         <div class="row">
             <div class="col">
                 <svg aria-label="Placeholder: Image cap" class="bd-placeholder-img card-img-top" height="180" preserveAspectRatio="xMidYMid slice" role="img" width="100%" xmlns="http://www.w3.org/2000/svg">
@@ -29,18 +42,11 @@
                 <button type="button" class="btn btn-outline-light" id="addToCartBtn">Add to cart</button>
                 <label for="quantity" class="form-label">Quantity</label>
                 <input type="number" class="form-control" id="quantity" name="quantity" value="1" min="1">
-                <div class="toast-container position-fixed bottom-0 end-0 p-3">
-                    <div id="liveToast" class="toast text-bg-success" role="alert" aria-live="assertive" aria-atomic="true">
-                        <div class="toast-header">
-                            <strong class="me-auto" id="toastMessage"></strong>
-                            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                        </div>
-                        <div class="toast-body" id="toastBody">
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
+    </div>
+    <div class="container">
+        <div class="h2">Recent reviews</div>
     </div>
     <input type="hidden" id="productId" value="{{ product.id }}">
 {% endblock %}
