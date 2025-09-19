@@ -23,7 +23,7 @@
         {% endif %}
         <div class="h3">Order items:</div>        
         {% for purchase_item in delivery.purchase.purchase_items.all %}
-            <div class="container border border-success border-1 rounded mb-3 p-3">
+            <div class="container border border-success border-1 rounded mb-3 p-3" id="itemDiv">
                 <div class="h3">
                     <a href="{% url 'product' purchase_item.product.id %}">{{purchase_item.product_name}} x {{purchase_item.quantity}}</a>
                 </div>
@@ -35,10 +35,10 @@
                 {% endcomment %}
                     {% if purchase_item.review %}
                         Your review - 
-                        <button type="button" class="btn btn-outline-success btn-sm" data-reviewid="{{purchase_item.review.id}}">
+                        <button type="button" class="btn btn-outline-success btn-sm" id="editReviewBtn" data-reviewid="{{purchase_item.review.id}}" data-itemid="{{purchase_item.id}}">
                             Edit review
                         </button>
-                        <button type="button" class="btn btn-outline-danger btn-sm" id="deleteReviewBtn" data-reviewid="{{purchase_item.review.id}}">
+                        <button type="button" class="btn btn-outline-danger btn-sm" id="deleteReviewBtn" data-reviewid="{{purchase_item.review.id}}" data-itemid="{{purchase_item.id}}">
                             Delete review
                         </button>
                         <div class="d-flex gap-2">
@@ -50,9 +50,7 @@
                                 {% endif %}
                             {% endfor %}
                         </div>
-                        <textarea class="form-control" id="comment{{purchase_item.id}}" rows="4" placeholder="Write your review here" disabled>
-                            {{ purchase_item.review.comment }}
-                        </textarea>
+                        <textarea class="form-control mb-3" id="comment{{purchase_item.id}}" rows="4" placeholder="Write your review here" disabled>{{ purchase_item.review.comment }}</textarea>
                         <button type="button" class="btn btn-outline-success" id="saveReviewBtn" data-itemid="{{purchase_item.id}}" style="display: none">
                             Save review
                         </button>

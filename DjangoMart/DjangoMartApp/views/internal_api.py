@@ -117,7 +117,7 @@ def manage_review(request):
     purchase_item_id = request.data.get('purchase_item_id')
     rating = request.data.get('rating')
     comment = request.data.get('comment')
-
+    
     if not all([purchase_item_id, rating]):
         return Response({'error': 'Mandatory field not provided'}, status=status.HTTP_400_BAD_REQUEST)
     rating = int(rating)
@@ -133,14 +133,10 @@ def manage_review(request):
         return Response({'error': 'You can only rate your own purchase items'}, status=status.HTTP_404_NOT_FOUND)
 
     try:
-        review, created = Review.objects.get_or_create(user=request.user,
-                                                purchase_item=purchase_item,
-                                                rating=rating,
-                                                comment=comment)
-        if not created:
-            review.rating = rating 
-            review.comment = comment
-            review.save()
+        review, created = Review.objects.get_or_create(user=request.user,purchase_item=purchase_item)
+        review.rating = rating 
+        review.comment = comment
+        review.save()
     except ValidationError:
         return Response({'error': 'Invalid value passed for rating'}, status=status.HTTP_400_BAD_REQUEST)
 

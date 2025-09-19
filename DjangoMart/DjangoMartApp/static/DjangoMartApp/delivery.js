@@ -15,6 +15,11 @@ document.addEventListener('DOMContentLoaded', () => {
     delete_review_btns.forEach(btn => {
         btn.addEventListener('click', e => {delete_review(e.currentTarget)})
     })
+
+    const edit_review_btns = document.querySelectorAll('#editReviewBtn');
+    edit_review_btns.forEach(btn => {
+        btn.addEventListener('click', e => {edit_review(e.currentTarget)})
+    })
 })
 
 
@@ -33,7 +38,6 @@ async function save_review(save_button) {
     const purchase_item_id = save_button.dataset.itemid;
     const star_group_id = `starGroup${purchase_item_id}`;
     const rating = get_review_star_count(star_group_id);
-
     if (rating <= 0) {
         let error_mesage = 'Please select star rating'
         display_toast('Error!', error_mesage, toast_background.ERROR);
@@ -84,4 +88,17 @@ async function delete_review(delete_button) {
     } else {
         location.reload();
     }
+}
+
+async function edit_review(edit_button) {
+    const purchase_item_id = edit_button.dataset.itemid;
+    const comment_id = `#comment${purchase_item_id}`;
+    const comment_textarea = document.querySelector(comment_id);
+
+    const parent_div = edit_button.closest('#itemDiv'); 
+    const save_button = parent_div.querySelector("#saveReviewBtn"); 
+
+    comment_textarea.disabled = false;
+    save_button.style.display = 'block';
+    
 }
