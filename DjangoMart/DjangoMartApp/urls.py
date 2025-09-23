@@ -1,9 +1,10 @@
 from django.urls import path
 
-from .views.web import (homepage_view, login_view, register,
-                    logout_view, category_view, cart_view,
-                    product_view, checkout, orders,
-                    delivery )
+from .views.auth import login_view, register_view, logout_view
+
+from .views.web import (homepage_view, category_view, cart_view,
+                        product_view, checkout, orders,
+                        delivery )
 
 from .views.internal_api import (add_to_cart, remove_from_cart, add_address,
                     remove_address, CustomTokenObtainPairView, manage_review,
@@ -20,7 +21,7 @@ urlpatterns = [
     # Webpage views
     path('', homepage_view, name='homepage'),
     path('login', login_view, name='login_view'),
-    path('register', register, name='register'),
+    path('register', register_view, name='register'),
     path('logout', logout_view, name='logout_view'),
     path('category/<str:category_slug>', category_view, name='category'),
     path('cart', cart_view, name='cart'),

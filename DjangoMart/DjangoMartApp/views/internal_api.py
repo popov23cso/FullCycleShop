@@ -21,7 +21,7 @@ def add_to_cart(request):
     try:
         product_id = request.data.get('product_id')
         quantity = request.data.get('quantity')
-        if not product_id or not quantity:
+        if not all([product_id, quantity]):
             return Response({'error': 'Missing product_id or quantity'}, status=status.HTTP_400_BAD_REQUEST)
 
         quantity = int(quantity)
@@ -97,6 +97,9 @@ def add_address(request):
 @permission_classes([IsAuthenticated])
 def remove_address(request):
     address_id = request.data.get('address_id')
+    if not address_id:
+        return Response({'error': 'Address not provided'}, status=status.HTTP_400_BAD_REQUEST)
+        
     try:
         delivery_destination = DeliveryDestination.objects.get(
         user=request.user,

@@ -54,11 +54,11 @@
                 <h6 class="card-subtitle mb-2 text-body-secondary">
                     <div class="d-flex gap-2">
                         {% for i in "12345"|make_list %}
-                        {% if forloop.counter <= review.rating %}
-                        <i class="bi bi-star-fill text-warning star"></i>
-                        {% else %}
-                        <i class="bi bi-star star"></i>
-                        {% endif %}
+                            {% if forloop.counter <= review.rating %}
+                                <i class="bi bi-star-fill text-warning star"></i>
+                            {% else %}
+                                <i class="bi bi-star star"></i>
+                            {% endif %}
                         {% endfor %}
                     </div>
                 </h6>
