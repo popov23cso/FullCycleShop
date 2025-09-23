@@ -1,6 +1,7 @@
 from ..models import (Category, Product, ShoppingCart,
                      DeliveryDestination, Purchase, 
-                    PurchaseItem, DeliveryTracking)
+                    PurchaseItem, DeliveryTracking,
+                    Review)
 
 from django.core.paginator import Paginator
 from django.shortcuts import redirect, get_object_or_404
@@ -138,3 +139,10 @@ def delivery(request, delivery_id):
     except DeliveryTracking.DoesNotExist:
         return render_django_mart_app(request, 'error', {'message':'The requested delivery does not exist for this user'})
     return render_django_mart_app(request, 'delivery', {'delivery':delivery})
+
+def review_view(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    reviews = Paginator(Review.objects.filter(product=product), 20)
+    page_number = request.GET.get('page')
+    review_page = reviews.get_page(page_number)
+    return render_django_mart_app(request, 'reviews', {'reviews':review_page, 'product':product})

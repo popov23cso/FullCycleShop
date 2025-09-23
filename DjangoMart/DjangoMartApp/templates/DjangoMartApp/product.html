@@ -48,25 +48,27 @@
     <div class="container">
         <div class="h2">Recent reviews</div>
         {% for review in reviews %}
-        <div class="card mb-3" style="width: 18rem;">
-            <div class="card-body">
-                <h5 class="card-title">{{review.user.username}}</h5>
-                <h6 class="card-subtitle mb-2 text-body-secondary">
-                    <div class="d-flex gap-2">
-                        {% for i in "12345"|make_list %}
-                            {% if forloop.counter <= review.rating %}
-                                <i class="bi bi-star-fill text-warning star"></i>
-                            {% else %}
-                                <i class="bi bi-star star"></i>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                </h6>
-                <p class="card-text">{{review.comment}}</p>
+            <div class="card mb-3" style="width: 18rem;">
+                <div class="card-body">
+                    <h5 class="card-title">{{review.user.username}}</h5>
+                    <h6 class="card-subtitle mb-2 text-body-secondary">
+                        <div class="d-flex gap-2">
+                            {% for i in "12345"|make_list %}
+                                {% if forloop.counter <= review.rating %}
+                                    <i class="bi bi-star-fill text-warning star"></i>
+                                {% else %}
+                                    <i class="bi bi-star star"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </h6>
+                    <p class="card-text">{{review.comment}}</p>
+                </div>
             </div>
-        </div>
-        <button type="button" class="btn btn-outline-light" id="addToCartBtn">See all reviews</button>
         {% endfor %}
+        <a href="{% url 'reviews' product.id %}">
+            <button type="button" class="btn btn-outline-light">See all reviews</button>
+        </a>
     </div>
     <input type="hidden" id="productId" value="{{ product.id }}">
 {% endblock %}

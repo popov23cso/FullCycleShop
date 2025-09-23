@@ -4,7 +4,7 @@ from .views.auth import login_view, register_view, logout_view
 
 from .views.web import (homepage_view, category_view, cart_view,
                         product_view, checkout, orders,
-                        delivery )
+                        delivery, review_view)
 
 from .views.internal_api import (add_to_cart, remove_from_cart, add_address,
                     remove_address, CustomTokenObtainPairView, manage_review,
@@ -29,6 +29,7 @@ urlpatterns = [
     path('checkout', checkout, name='checkout'),
     path('orders', orders, name='orders'),
     path('delivery/<int:delivery_id>', delivery, name='delivery'),
+    path('reviews/<int:product_id>', review_view, name='reviews'),
 
     # Internal API`s
     path('add_to_cart', add_to_cart, name='add_to_cart'),
