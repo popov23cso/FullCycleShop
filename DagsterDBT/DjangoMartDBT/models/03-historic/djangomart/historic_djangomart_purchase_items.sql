@@ -1,1 +1,1 @@
-{{ historize_relation('semantic_djangomart_purchase_items', 'ID', 'UPDATED_DATE') }}
+{{ historize_relation('semantic_djangomart_purchase_items', 'ID') }}
