@@ -121,7 +121,7 @@ def manage_review(request):
     rating = request.data.get('rating')
     comment = request.data.get('comment')
     
-    if not all([purchase_item_id, rating]):
+    if not rating:
         return Response({'error': 'Mandatory field not provided'}, status=status.HTTP_400_BAD_REQUEST)
     rating = int(rating)
 
@@ -136,9 +136,15 @@ def manage_review(request):
         return Response({'error': 'You can only rate your own purchase items'}, status=status.HTTP_404_NOT_FOUND)
 
     try:
-        review, created = Review.objects.get_or_create(user=request.user,purchase_item=purchase_item)
-        review.rating = rating 
-        review.comment = comment
+        review, created = Review.objects.get_or_create(user=request.user,
+                                                       purchase_item=purchase_item,
+                                                       product=purchase_item.product,
+                                                       rating=rating)
+        if created:
+            purchase_item.product.rating_count += 1
+            purchase_item.product.save()
+        if comment:
+            review.comment = comment
         review.save()
     except ValidationError:
         return Response({'error': 'Invalid value passed for rating'}, status=status.HTTP_400_BAD_REQUEST)
@@ -158,7 +164,9 @@ def delete_review(request):
         review = Review.objects.get(user=request.user, id=review_id)
     except Review.DoesNotExist:
         return Response({'error': 'Such review does not exist for this user'}, status=status.HTTP_404_BAD_REQUEST)
-
+    
+    review.product.rating_count -= 1
+    review.product.save()
     review.delete()
 
     return Response({'message': 'Review deleted succesfully'}, status=status.HTTP_200_OK)
