@@ -2,7 +2,7 @@ from django.db import models
 from django.utils import timezone
 
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator, MaxLengthValidator
 
 # Create your models here.
 
@@ -171,7 +171,7 @@ class Review(models.Model):
     purchase_item = models.OneToOneField('PurchaseItem', on_delete=models.CASCADE, related_name='review')
     product = models.ForeignKey('Product', on_delete=models.CASCADE, related_name='review')
     rating = models.PositiveSmallIntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)])
-    comment = models.TextField(blank=True, null=True)
+    comment = models.TextField(blank=True, null=True, validators=[MaxLengthValidator(300)])
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
 
