@@ -1,1 +1,4 @@
-{{ historize_relation('semantic_djangomart_products', 'ID') }}
+{{ historize_relation(
+    relation_name='semantic_djangomart_products',
+    id_column='ID'
+) }}

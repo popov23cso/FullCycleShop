@@ -12,18 +12,18 @@
 {% endmacro%}
 
 
-{% macro historize_relation(relation_name, id_column) %}
+{% macro historize_relation(relation_name, id_column, delta_column='DWH_BATCH_DATETIME') %}
 
     WITH relation_ranked AS 
     (
         SELECT
             r.*,
-            ROW_NUMBER() OVER (PARTITION BY {{id_column}} ORDER BY DWH_BATCH_DATETIME DESC) as row_rank
+            ROW_NUMBER() OVER (PARTITION BY {{id_column}} ORDER BY {{delta_column}} DESC) as row_rank
         FROM {{ ref(relation_name) }} r
 
         {% if is_incremental() %}
             -- only pull new/changed rows
-            WHERE DWH_BATCH_DATETIME > COALESCE((SELECT max(DWH_BATCH_DATETIME) FROM {{ this }}), {{var('BEGINNING_OF_TIME')}})
+            WHERE {{delta_column}} > COALESCE((SELECT max({{delta_column}}) FROM {{ this }}), {{var('BEGINNING_OF_TIME')}})
         {% endif %}
     )
     SELECT 
