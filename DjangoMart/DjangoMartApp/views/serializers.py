@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.exceptions import AuthenticationFailed
 from ..models import (Purchase, PurchaseItem, Product, 
-                      User, Category)
+                      User, Category, Review)
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
@@ -38,3 +38,8 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         exclude = ('password', 'user_permissions', 'delivery_details_provided_count',
                     'groups')
+        
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = '__all__' 

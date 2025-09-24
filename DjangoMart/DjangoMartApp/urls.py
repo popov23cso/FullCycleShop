@@ -11,7 +11,7 @@ from .views.internal_api import (add_to_cart, remove_from_cart, add_address,
                     delete_review)
 
 from .views.external_api import (get_purchases, get_purchase_items, get_products, 
-                                 get_users, get_categories)
+                                 get_users, get_categories, get_reviews)
 
 from rest_framework_simplejwt.views import (
     TokenRefreshView
@@ -45,6 +45,7 @@ urlpatterns = [
     path('get_products', get_products, name='get_products'),
     path('get_users', get_users, name='get_users'),
     path('get_categories', get_categories, name='get_categories'),
+    path('get_reviews', get_reviews, name='get_reviews'),
 
     # Token based authentication
     path('api/token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),

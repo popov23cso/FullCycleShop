@@ -6,10 +6,10 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.utils import timezone
 from .serializers import (PurchaseSerializer, PurchaseItemSerializer, ProductSerializer,
-                          UserSerializer, CategorySerializer)
+                          UserSerializer, CategorySerializer, ReviewSerializer)
 from ..models import (Product, ShoppingCart, CartItem, 
                       Purchase, PurchaseItem, User,
-                      Category)
+                      Category, Review)
 from django.apps import apps
 
 
@@ -89,6 +89,7 @@ def serialize_model_data(data, request):
     paginator = ApiPagination()
     results_page = paginator.paginate_queryset(data, request)
 
+    # many=True tells the serializer to accept a query set instead of a single object
     if data.model is Purchase:
         serializer = PurchaseSerializer(results_page, many=True)
     elif data.model is PurchaseItem:
@@ -99,6 +100,8 @@ def serialize_model_data(data, request):
         serializer = UserSerializer(results_page, many=True)
     elif data.model is Category:
         serializer = CategorySerializer(results_page, many=True)
+    elif data.model is Review:
+        serializer = ReviewSerializer(results_page, many=True)
     else:
         raise ValueError(f'Model instance with no defined serialized passed: {data.model._meta.model_name }')
 

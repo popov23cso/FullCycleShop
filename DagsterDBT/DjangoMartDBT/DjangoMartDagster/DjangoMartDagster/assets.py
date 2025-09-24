@@ -70,5 +70,15 @@ def get_categories(context):
     endpoint_name = 'get_categories'
     return ingest_djangomart_data(endpoint_name, context.resources.batch_datetime_resource, context.log)
 
+@asset(
+        required_resource_keys={'batch_datetime_resource'},
+        group_name='djangomart_api_objects',
+        description='Fetches djangomart review data and saves it to a parquet file in the data lake',
+        metadata=DJANGOMART_ASSET_METADATA
+        )
+def get_reviews(context):
+    endpoint_name = 'get_reviews'
+    return ingest_djangomart_data(endpoint_name, context.resources.batch_datetime_resource, context.log)
+
 
     

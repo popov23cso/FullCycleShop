@@ -33,3 +33,8 @@ def get_users(request):
 @permission_classes([IsAuthenticated])
 def get_categories(request):
     return get_standart_api_model_data(request, 'Category')
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_reviews(request):
+    return get_standart_api_model_data(request, 'Review')
