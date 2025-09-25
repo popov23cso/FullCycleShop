@@ -13,5 +13,8 @@
     },
     "get_categories": {
         "last_ingestion_dtt": "2025-09-16 174719"
+    },
+    "get_reviews": {
+        "last_ingestion_dtt": "2025-09-25 112024"
     }
 }
