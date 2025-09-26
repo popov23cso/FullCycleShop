@@ -1,16 +1,17 @@
 from django.urls import path
 
-from .views.web import (homepage_view, login_view, register,
-                    logout_view, category_view, cart_view,
-                    product_view, checkout, orders,
-                    delivery )
+from .views.auth import login_view, register_view, logout_view
+
+from .views.web import (homepage_view, category_view, cart_view,
+                        product_view, checkout, orders,
+                        delivery, review_view)
 
 from .views.internal_api import (add_to_cart, remove_from_cart, add_address,
                     remove_address, CustomTokenObtainPairView, manage_review,
                     delete_review)
 
 from .views.external_api import (get_purchases, get_purchase_items, get_products, 
-                                 get_users, get_categories)
+                                 get_users, get_categories, get_reviews)
 
 from rest_framework_simplejwt.views import (
     TokenRefreshView
@@ -20,7 +21,7 @@ urlpatterns = [
     # Webpage views
     path('', homepage_view, name='homepage'),
     path('login', login_view, name='login_view'),
-    path('register', register, name='register'),
+    path('register', register_view, name='register'),
     path('logout', logout_view, name='logout_view'),
     path('category/<str:category_slug>', category_view, name='category'),
     path('cart', cart_view, name='cart'),
@@ -28,6 +29,7 @@ urlpatterns = [
     path('checkout', checkout, name='checkout'),
     path('orders', orders, name='orders'),
     path('delivery/<int:delivery_id>', delivery, name='delivery'),
+    path('reviews/<int:product_id>', review_view, name='reviews'),
 
     # Internal API`s
     path('add_to_cart', add_to_cart, name='add_to_cart'),
@@ -43,6 +45,7 @@ urlpatterns = [
     path('get_products', get_products, name='get_products'),
     path('get_users', get_users, name='get_users'),
     path('get_categories', get_categories, name='get_categories'),
+    path('get_reviews', get_reviews, name='get_reviews'),
 
     # Token based authentication
     path('api/token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),

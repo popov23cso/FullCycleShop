@@ -39,16 +39,16 @@
                     {% for num in products.paginator.page_range %}
                         {% if num == 1 or num == products.paginator.num_pages %}
                             {% if num == products.number %}
-                                <span class="btn btn-primary active">{{ num }}</span>
+                                <span class="btn btn-outline-light active">{{ num }}</span>
                             {% else %}
-                                <a class="btn btn-light" href="?page={{ num }}">{{ num }}</a>
+                                <a class="btn btn-outline-light" href="?page={{ num }}">{{ num }}</a>
                             {% endif %}
                         {% elif num == products.number %}
-                            <span class="btn btn-primary active">{{ num }}</span>
+                            <span class="btn btn-outline-light active">{{ num }}</span>
                         {% elif num >= products.number|add:"-2" and num <= products.number|add:"2" %}
-                            <a class="btn btn-light" href="?page={{ num }}">{{ num }}</a>
+                            <a class="btn btn-outline-light" href="?page={{ num }}">{{ num }}</a>
                         {% elif num == products.number|add:"-3" or num == products.number|add:"3" %}
-                            <span class="btn disabled">...</span>
+                            <span class="btn btn-outline-light disabled">...</span>
                         {% endif %}
                     {% endfor %}
 

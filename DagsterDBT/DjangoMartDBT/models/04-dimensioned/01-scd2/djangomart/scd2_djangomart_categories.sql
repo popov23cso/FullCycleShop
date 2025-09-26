@@ -1,1 +1,4 @@
-{{ star_schema_scd2('historic_djangomart_categories', 'ID', 'UPDATED_DATE') }}
+{{ star_schema_scd2(
+    relation_name='historic_djangomart_categories',
+    id_column='ID'
+) }}

@@ -1,0 +1,69 @@
+{% extends "DjangoMartApp/layout.html" %}
+
+{% block styles %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+{% endblock %}
+
+{% block title %}
+    {{category}}
+{% endblock %}
+
+{% block body %}
+    <div class="container mt-3">
+        <div class="row">
+            <div class="h3 mb-3">Reviews for {{product.title}}
+            <a href="{% url 'product' product.id %}">
+                <button type="button" class="btn btn-outline-light">Back to product</button>
+            </a>
+            </div>
+            <div class="container">
+                <div class="container mb-5">
+                    {% for review in reviews %}
+                        <div class="card mb-3" style="width: 18rem;">
+                            <div class="card-body">
+                                <h5 class="card-title">{{review.user.username}}</h5>
+                                <h6 class="card-subtitle mb-2 text-body-secondary">
+                                    <div class="d-flex gap-2">
+                                        {% for i in "12345"|make_list %}
+                                            {% if forloop.counter <= review.rating %}
+                                                <i class="bi bi-star-fill text-warning star"></i>
+                                            {% else %}
+                                                <i class="bi bi-star star"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </h6>
+                                <p class="card-text">{{review.comment}}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div>
+                    {% if reviews.has_previous %}
+                        <a class="btn btn-light" href="?page={{ reviews.previous_page_number }}">Previous</a>
+                    {% endif %}
+
+                    {% for num in reviews.paginator.page_range %}
+                        {% if num == 1 or num == reviews.paginator.num_pages %}
+                            {% if num == reviews.number %}
+                                <span class="btn btn-outline-light active">{{ num }}</span>
+                            {% else %}
+                                <a class="btn btn-outline-light" href="?page={{ num }}">{{ num }}</a>
+                            {% endif %}
+                        {% elif num == reviews.number %}
+                            <span class="btn btn-outline-light active">{{ num }}</span>
+                        {% elif num >= reviews.number|add:"-2" and num <= reviews.number|add:"2" %}
+                            <a class="btn btn-outline-light" href="?page={{ num }}">{{ num }}</a>
+                        {% elif num == reviews.number|add:"-3" or num == reviews.number|add:"3" %}
+                            <span class="btn btn-outline-light disabled">...</span>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if reviews.has_next %}
+                        <a class="btn btn-light" href="?page={{ reviews.next_page_number }}">Next</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

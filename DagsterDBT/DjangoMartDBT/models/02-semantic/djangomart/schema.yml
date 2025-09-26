@@ -214,3 +214,41 @@ models:
         description: "ID of the parent category if such is available"
       - *created_date
       - *updated_date
+  - name: semantic_djangomart_reviews
+    description: |
+     Reviews of products coming from the djangomart source system with
+     its columns clearly and consistenly named and its types casted
+    columns:
+      - *id
+      - name: RATING
+        description: "Star rating for the review (1-5)"
+        tests:
+          - not_null:
+              arguments: {}
+              config:
+                severity: warn
+      - name: COMMENT
+        description: "Comment that describes the review (optional)"
+      - name: USER_ID
+        description: "ID of the user who posted the review"
+        tests:
+          - not_null:
+              arguments: {}
+              config:
+                severity: warn
+      - name: PURCHASE_ITEM_ID
+        description: "ID of the purchase item that is reviewed"
+        tests:
+          - not_null:
+              arguments: {}
+              config:
+                severity: warn
+      - name: PRODUCT_ID
+        description: "ID of the product that is being reviewed"
+        tests:
+          - not_null:
+              arguments: {}
+              config:
+                severity: warn
+      - *created_date
+      - *updated_date

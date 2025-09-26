@@ -38,23 +38,29 @@ models:
     01-raw:
       +schema: raw
       +materialized: table
+      +tags: ["djangomart", "djangomart-dbt", "djangomart-raw"]
     02-semantic:
       +schema: semantic
       +materialized: view
+      +tags: ["djangomart", "djangomart-dbt", "djangomart-semantic"]
     03-historic:
       +schema: historic
       +materialized: incremental
       +unique_key: DWH_SK
+      +tags: ["djangomart", "djangomart-dbt", "djangomart-historic"]
     04-dimensioned:
       +schema: dimensioned
       +materialized: incremental
       +unique_key: DWH_SK
+      +tags: ["djangomart", "djangomart-dbt", "djangomart-dimensioned"]
     05-product:
       +schema: product
       +materialized: table
+      +tags: ["djangomart", "djangomart-dbt", "djangomart-product"]
     06-modeled:
       +schema: modeled
       +materialized: view
+      +tags: ["djangomart", "djangomart-dbt", "djangomart-modeled"]
       
 
 vars:

@@ -57,4 +57,10 @@ models:
       - *id
       - *dwh_file_path
       - *dwh_batch_datetime
+  - name: raw_djangomart_reviews
+    description: "Product review data coming from the djangomart source system."
+    columns:
+      - *id
+      - *dwh_file_path
+      - *dwh_batch_datetime
 
