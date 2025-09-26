@@ -27,6 +27,7 @@
         {% endif %}
     )
     SELECT 
+        -- generate a surrogate key
         CONCAT({{id_column}}, '_', DWH_BATCH_DATETIME_STR) AS DWH_SK,
         r.*,
         CASE
