@@ -138,13 +138,14 @@ def manage_review(request):
     try:
         review, created = Review.objects.get_or_create(user=request.user,
                                                        purchase_item=purchase_item,
-                                                       product=purchase_item.product,
-                                                       rating=rating)
+                                                       product=purchase_item.product)
         if created:
             purchase_item.product.rating_count += 1
             purchase_item.product.save()
         if comment:
             review.comment = comment
+            
+        review.rating = rating
         review.save()
     except ValidationError:
         return Response({'error': 'Invalid value passed for rating'}, status=status.HTTP_400_BAD_REQUEST)

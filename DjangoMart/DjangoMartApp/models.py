@@ -188,7 +188,9 @@ class Review(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     purchase_item = models.OneToOneField('PurchaseItem', on_delete=models.CASCADE, related_name='review')
     product = models.ForeignKey('Product', on_delete=models.CASCADE, related_name='review')
-    rating = models.PositiveSmallIntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)])
+    rating = models.PositiveSmallIntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)],
+                                            null=True,
+                                            blank=True)
     comment = models.TextField(blank=True, null=True, validators=[MaxLengthValidator(300)])
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
