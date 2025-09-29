@@ -1,4 +1,4 @@
-from base_command_class import BaseSeedCommand
+from .base_command_class import BaseSeedCommand
 from ...factories import ReviewFactory
 
 class Command(BaseSeedCommand):

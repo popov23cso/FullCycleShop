@@ -1,7 +1,0 @@
-DjangoMartDBT:
-  outputs:
-    dev:
-      type: duckdb
-      threads: 4
-      path: duckdb_database.db
-  target: dev

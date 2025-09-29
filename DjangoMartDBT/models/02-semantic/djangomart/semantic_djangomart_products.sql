@@ -1,0 +1,25 @@
+SELECT
+    {{ list_raw_metadata() }}
+    id::STRING AS ID,
+    title::STRING AS TITLE,
+    description::STRING AS DESCRIPTION,
+    price::DECIMAL AS PRICE,
+    stock::INT AS STOCK,
+    rating::DECIMAL AS RATING,
+    rating_count::INT AS RATING_COUNT,
+    sales_count::INT AS SALES_COUNT,
+    product_weight::DECIMAL AS PRODUCT_WEIGHT,
+    product_height::DECIMAL AS PRODUCT_HEIGHT,
+    product_width::DECIMAL AS PRODUCT_WIDTH,
+    product_length::DECIMAL AS PRODUCT_LENGTH,
+    package_weight::DECIMAL AS PACKAGE_WEIGHT,
+    package_height::DECIMAL AS PACKAGE_HEIGHT,
+    package_width::DECIMAL AS PACKAGE_WIDTH,
+    package_length::DECIMAL AS PACKAGE_LENGTH,
+    warranty::INT AS WARRANTY_MONTHS,
+    created_date::DATETIME AS CREATED_DATE,
+    updated_date::DATETIME AS UPDATED_DATE,
+    is_active::BOOLEAN AS IS_ACTIVE,
+    brand::STRING AS BRAND_ID,
+    category::STRING AS CATEGORY_ID
+FROM {{ref('raw_djangomart_products')}}
