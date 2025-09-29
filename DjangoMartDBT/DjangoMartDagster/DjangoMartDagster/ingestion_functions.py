@@ -6,6 +6,7 @@ import pandas as pd
 from .api_secrets import DJANGOMART_USERNAME, DJANGOMART_PASSWORD
 import json
 from dagster import Failure
+from filelock import FileLock
 
 PROJECT_NAME = 'DjangoMartDagster'
 
@@ -109,7 +110,7 @@ def get_djangomart_data(access_token, refresh_token, endpoint, updated_after):
 def ingest_djangomart_data(endpoint_name, batch_datetime, log):
     current_dir = Path.cwd()
     metadata_file_name = 'django_mart_tables.json'
-    metadata_file_path = current_dir / PROJECT_NAME /'metadata' /  metadata_file_name
+    metadata_file_path = current_dir / PROJECT_NAME / 'metadata' /  metadata_file_name
 
     with open(metadata_file_path, 'r') as metadata_file:
         metadata = json.load(metadata_file)
@@ -126,11 +127,19 @@ def ingest_djangomart_data(endpoint_name, batch_datetime, log):
     try:
         get_djangomart_data(access_token, refresh_token, endpoint_name, delta_dtt)
         log.info(f'Succesfully ingested {endpoint_name} object')
-        metadata[endpoint_name]['last_ingestion_dtt'] = batch_datetime
+        delta_dtt = batch_datetime
     except Exception:
         raise Failure(f'Exception occured during ingestion of {endpoint_name} object')
 
+    with FileLock(str(metadata_file_path) + '.lock'):
+        
+        with open(metadata_file_path, 'r+') as metadata_file:
+            metadata = json.load(metadata_file)
+            metadata[endpoint_name]['last_ingestion_dtt'] = delta_dtt
 
-    # save updated timestamps
-    with open(metadata_file_path, 'w') as metadata_file:
-        json.dump(metadata, metadata_file, indent=4)
+            # move file pointer at file beggining
+            metadata_file.seek(0)
+
+            # paste new data in and truncate everything after the new data
+            json.dump(metadata, metadata_file, indent=4)
+            metadata_file.truncate()
