@@ -27,8 +27,11 @@
         {% endif %}
     )
     SELECT 
-        -- generate a surrogate key
-        CONCAT({{id_column}}, '_', DWH_BATCH_DATETIME_STR) AS DWH_SK,
+        -- generate a surrogate key, hash function will be sufficient
+        -- to ensure no collisions until billions of rows, in larger
+        -- scale of data or in case of collisions, 
+        -- a more robust hash function should be used
+        HASH({{id_column}}, DWH_BATCH_DATETIME_STR) AS DWH_SK,
         r.*,
         CASE
             WHEN row_rank = 1 THEN 1
