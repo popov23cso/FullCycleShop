@@ -17,17 +17,24 @@
             -- only pull new/changed rows
             WHERE {{delta_column}} > COALESCE((SELECT max({{delta_column}}) FROM {{ this }}), {{var('BEGINNING_OF_TIME')}})
         {% endif %}
+    ),
+    dimensioned AS 
+    (
+        SELECT 
+            r.*,
+            CASE
+                WHEN row_number = 1 THEN {{var('BEGINNING_OF_TIME')}}
+                ELSE {{delta_column}}
+            END AS DWH_EFFECTIVE_FROM,
+            CASE 
+                WHEN DWH_IS_LATEST = 1 THEN {{var('END_OF_TIME')}}
+                ELSE next_delta
+            END AS DWH_EFFECTIVE_TO
+        FROM delta_row_numbers r
     )
     SELECT 
-        r.*,
-        CASE
-            WHEN row_number = 1 THEN {{var('BEGINNING_OF_TIME')}}
-            ELSE {{delta_column}}
-        END AS DWH_EFFECTIVE_FROM,
-        CASE 
-            WHEN DWH_IS_LATEST = 1 THEN {{var('END_OF_TIME')}}
-            ELSE next_delta
-        END AS DWH_EFFECTIVE_TO
-    FROM delta_row_numbers r
+        -- exclude helper columns from end resultset
+        * EXCLUDE(row_number, next_delta)
+    FROM dimensioned
 
 {% endmacro%}
