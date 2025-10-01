@@ -5,5 +5,6 @@ SELECT
     is_invalid::BOOLEAN AS IS_INVALID,
     created_date::DATETIME AS CREATED_DATE,
     updated_date::DATETIME AS UPDATED_DATE,
+    generated_date::DATETIME AS GENERATED_DATE,
     user::STRING AS USER
 FROM {{ref('raw_djangomart_purchases')}}

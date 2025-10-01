@@ -24,6 +24,10 @@ class User(AbstractUser):
     # use to easily identify dummy records, that have been auto generated, for deletion
     is_auto_generated = models.BooleanField(default=False)
 
+    # add a field for generated dates to help create random date fields for all generated records
+    # while not impacting backend logic by modifying created/updated date to suit the factory generation needs
+    generated_date = models.DateTimeField(blank=True, null=True)
+
     def __str__(self):
         return f'{self.first_name} {self.last_name} {self.email}'
     
@@ -82,6 +86,10 @@ class Category(models.Model):
     # use to easily identify dummy records, that have been auto generated, for deletion
     is_auto_generated = models.BooleanField(default=False)
 
+    # add a field for generated dates to help create random date fields for all generated records
+    # while not impacting backend logic by modifying created/updated date to suit the factory generation needs
+    generated_date = models.DateTimeField(blank=True, null=True)
+
     # validate that a parent category does not have a parent itself
     def save(self, *args, **kwargs):
         if self.parent_category and self.is_main_category:
@@ -99,6 +107,10 @@ class Brand(models.Model):
 
     # use to easily identify dummy records, that have been auto generated, for deletion
     is_auto_generated = models.BooleanField(default=False)
+
+    # add a field for generated dates to help create random date fields for all generated records
+    # while not impacting backend logic by modifying created/updated date to suit the factory generation needs
+    generated_date = models.DateTimeField(blank=True, null=True)
     
     def __str__(self):
         return f'{self.title}'
@@ -131,6 +143,10 @@ class Product(models.Model):
 
     # use to easily identify dummy records, that have been auto generated, for deletion
     is_auto_generated = models.BooleanField(default=False)
+
+    # add a field for generated dates to help create random date fields for all generated records
+    # while not impacting backend logic by modifying created/updated date to suit the factory generation needs
+    generated_date = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         return f'{self.title}'
@@ -168,6 +184,10 @@ class Purchase(models.Model):
     # use to easily identify dummy records, that have been auto generated, for deletion
     is_auto_generated = models.BooleanField(default=False)
 
+    # add a field for generated dates to help create random date fields for all generated records
+    # while not impacting backend logic by modifying created/updated date to suit the factory generation needs
+    generated_date = models.DateTimeField(blank=True, null=True)
+
 class PurchaseItem(models.Model):
     purchase = models.ForeignKey(Purchase, on_delete=models.DO_NOTHING, related_name='purchase_items')
     product_name = models.CharField(max_length=100)
@@ -184,6 +204,10 @@ class PurchaseItem(models.Model):
     # use to easily identify dummy records, that have been auto generated, for deletion
     is_auto_generated = models.BooleanField(default=False)
 
+    # add a field for generated dates to help create random date fields for all generated records
+    # while not impacting backend logic by modifying created/updated date to suit the factory generation needs
+    generated_date = models.DateTimeField(blank=True, null=True)
+
 class Review(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     purchase_item = models.OneToOneField('PurchaseItem', on_delete=models.CASCADE, related_name='review')
@@ -197,6 +221,10 @@ class Review(models.Model):
 
     # use to easily identify dummy records, that have been auto generated, for deletion
     is_auto_generated = models.BooleanField(default=False)
+
+    # add a field for generated dates to help create random date fields for all generated records
+    # while not impacting backend logic by modifying created/updated date to suit the factory generation needs
+    generated_date = models.DateTimeField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
         

@@ -15,5 +15,6 @@ SELECT
     is_deleted::BOOLEAN AS IS_DELETED,
     is_api_user::BOOLEAN AS IS_API_USER,
     created_date::DATETIME AS CREATED_DATE,
-    updated_date::DATETIME AS UPDATED_DATE
+    updated_date::DATETIME AS UPDATED_DATE,
+    generated_date::DATETIME AS GENERATED_DATE
 FROM {{ref('raw_djangomart_users')}}

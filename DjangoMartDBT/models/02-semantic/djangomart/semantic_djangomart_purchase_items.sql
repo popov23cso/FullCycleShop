@@ -7,5 +7,6 @@ SELECT
     quantity::INT AS QUANTITY,
     created_date::DATETIME AS CREATED_DATE,
     updated_date::DATETIME AS UPDATED_DATE,
+    generated_date::DATETIME AS GENERATED_DATE,
     purchase::STRING AS PURCHASE_ID
 FROM {{ref('raw_djangomart_purchase_items')}}

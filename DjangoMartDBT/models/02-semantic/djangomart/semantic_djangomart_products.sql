@@ -19,6 +19,7 @@ SELECT
     warranty::INT AS WARRANTY_MONTHS,
     created_date::DATETIME AS CREATED_DATE,
     updated_date::DATETIME AS UPDATED_DATE,
+    generated_date::DATETIME AS GENERATED_DATE,
     is_active::BOOLEAN AS IS_ACTIVE,
     brand::STRING AS BRAND_ID,
     category::STRING AS CATEGORY_ID
