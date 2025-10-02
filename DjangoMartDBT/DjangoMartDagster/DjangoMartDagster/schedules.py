@@ -5,7 +5,7 @@ from dagster_dbt import build_schedule_from_dbt_selection
 from dagster import ScheduleDefinition
 
 from .assets import DjangoMartDBT_dbt_assets
-from .jobs import djnagomart_job
+from .jobs import djnagomart_daily_job
 
 schedules = [
 #     build_schedule_from_dbt_selection(
@@ -17,6 +17,6 @@ schedules = [
 ]
 
 daily_djangomart_schedule = ScheduleDefinition(
-    job=djnagomart_job,
+    job=djnagomart_daily_job,
     cron_schedule="0 6 * * *",  # every day at 6am
 )

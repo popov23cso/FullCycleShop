@@ -11,7 +11,7 @@ class BaseSeedCommand(BaseCommand):
             '--count',
             type=int,
             default=1,
-            choices=(1, 10, 100, 200, 500),
+            choices=(1, 10, 20, 50, 100, 200, 500),
             help='Number of objects to create'
         )
 
