@@ -43,6 +43,6 @@
     )
     SELECT 
         -- exclude helper columns from end resultset
-        * EXCLUDE(row_rank)
+        * EXCLUDE(row_rank, DWH_BATCH_DATETIME_STR)
     FROM historized
 {% endmacro %}

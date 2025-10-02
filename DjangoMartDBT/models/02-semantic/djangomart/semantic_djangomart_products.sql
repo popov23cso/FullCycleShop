@@ -17,9 +17,10 @@ SELECT
     package_width::DECIMAL AS PACKAGE_WIDTH,
     package_length::DECIMAL AS PACKAGE_LENGTH,
     warranty::INT AS WARRANTY_MONTHS,
-    created_date::DATETIME AS CREATED_DATE,
-    updated_date::DATETIME AS UPDATED_DATE,
-    generated_date::DATETIME AS GENERATED_DATE,
+    created_date::TIMESTAMP AS CREATED_DATE,
+    updated_date::TIMESTAMP AS UPDATED_DATE,
+    coalesce(generated_date, '2025-01-01T10:10:10Z')::TIMESTAMP AS GENERATED_DATETIME,
+    GENERATED_DATETIME::DATE AS GENERATED_DATE,
     is_active::BOOLEAN AS IS_ACTIVE,
     brand::STRING AS BRAND_ID,
     category::STRING AS CATEGORY_ID
