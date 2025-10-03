@@ -15,7 +15,7 @@
 
         {% if is_incremental() %}
             -- only pull new/changed rows
-            WHERE {{delta_column}} > COALESCE((SELECT max({{delta_column}}) FROM {{ this }}), {{var('BEGINNING_OF_TIME')}})
+            WHERE {{delta_column}} > COALESCE((SELECT MAX({{delta_column}}) FROM {{ this }}), {{var('BEGINNING_OF_TIME')}})
         {% endif %}
     ),
     dimensioned AS 

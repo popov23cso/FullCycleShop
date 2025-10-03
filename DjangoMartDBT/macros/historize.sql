@@ -34,6 +34,7 @@
             -- scale of data or in case of collisions, 
             -- a more robust hash function should be used
             HASH({{id_column}}, DWH_BATCH_DATETIME_STR) AS DWH_SK,
+            {{delta_column}} AS DWH_DELTA_DATE,
             r.*,
             CASE
                 WHEN row_rank = 1 THEN 1
