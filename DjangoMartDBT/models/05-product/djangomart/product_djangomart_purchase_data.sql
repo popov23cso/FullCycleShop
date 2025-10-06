@@ -3,10 +3,12 @@ SELECT
     p.TOTAL_PRICE,
     p.USER,
     pr.DWH_SK AS PRODUCT_SK,
+    pr.ID AS PRODUCT_ID,
     pr.TITLE AS PRODUCT_TITLE,
     pr.STOCK,
     pr.RATING,
     c.DWH_SK AS CATEGORY_SK,
+    c.ID AS CATEGORY_ID,
     c.TITLE AS CATEGORY_TITLE
 FROM {{ref('historic_djangomart_purchase_items')}} pi
 JOIN {{ref('historic_djangomart_purchases')}} p
