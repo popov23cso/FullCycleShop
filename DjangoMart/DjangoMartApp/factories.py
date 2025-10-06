@@ -78,7 +78,7 @@ class PurchaseItemFactory(BaseFactory):
     class Meta:
         model = PurchaseItem
 
-    purchase = factory.Iterator(Purchase.objects.all())
+    purchase = factory.SubFactory(PurchaseFactory)
     product = factory.Iterator(Product.objects.all())
     product_name = factory.LazyAttribute(lambda obj: obj.product.title)
     quantity = factory.Faker('pyint', min_value=1, max_value=5)
