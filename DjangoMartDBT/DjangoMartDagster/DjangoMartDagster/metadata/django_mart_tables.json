@@ -1,20 +1,20 @@
 {
     "get_purchases": {
-        "last_ingestion_dtt": "2025-10-02 170318"
+        "last_ingestion_dtt": "2025-10-06 090020"
     },
     "get_purchase_items": {
-        "last_ingestion_dtt": "2025-10-02 170318"
+        "last_ingestion_dtt": "2025-10-06 090020"
     },
     "get_products": {
-        "last_ingestion_dtt": "2025-10-03 170904"
+        "last_ingestion_dtt": "2025-10-06 090020"
     },
     "get_users": {
-        "last_ingestion_dtt": "2025-10-02 170318"
+        "last_ingestion_dtt": "2025-10-06 090020"
     },
     "get_categories": {
-        "last_ingestion_dtt": "2025-10-03 160702"
+        "last_ingestion_dtt": "2025-10-06 120707"
     },
     "get_reviews": {
-        "last_ingestion_dtt": "2025-10-02 170318"
+        "last_ingestion_dtt": "2025-10-06 090020"
     }
 }

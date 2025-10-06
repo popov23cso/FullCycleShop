@@ -1,10 +1,9 @@
 -- use this macro to generate a slowly changing dimension of type 2
--- important note: this is best used for star schema dimensions 
+-- important note: this should be used in for star schema dimensions
 -- (dimensions that do not join with other dimensions)
--- if you use it on a snowflake schema dimension changes in the other dimensions wont reflect in your scd2 logic
--- (no new rows will be inserted when a joined dimension adds a new row). Use if dimension is in star schema
--- or the changes in the other dimension are not of business importance
-{% macro star_schema_scd2(relation_name, id_column, delta_column='DWH_BATCH_DATETIME') %}
+-- or in case of snowflake schema, the dimension should first be integrated, according 
+-- to the integration procedure, before being passed to this macro
+{% macro generate_scd2(relation_name, id_column, delta_column='DWH_BATCH_DATETIME') %}
     WITH delta_row_numbers AS 
     (
         SELECT 
