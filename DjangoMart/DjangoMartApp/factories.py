@@ -4,7 +4,7 @@ from django.contrib.auth.hashers import make_password
 from .models import (User, Brand, Category,
                      Product, Purchase, PurchaseItem,
                      Review)
-from datetime import datetime
+from datetime import datetime, timezone
 from django.utils.text import slugify
 
 fake = Faker()
@@ -14,13 +14,12 @@ class BaseFactory(factory.django.DjangoModelFactory):
         abstract = True
 
     # define the common columns that are present accross all models
-    created_date = factory.LazyFunction(
+    generated_date = factory.LazyFunction(
         lambda: fake.date_time_between(
-            start_date=datetime(2023, 1, 1), 
-            end_date=datetime(2025, 12, 31)
-        )
+            start_date=datetime.fromisoformat('2023-01-01'), 
+            end_date=datetime.fromisoformat('2026-01-01'),
+            tzinfo=timezone.utc)
     )
-    updated_date = factory.SelfAttribute('created_date')
     is_auto_generated = True
 
 class UserFactory(BaseFactory):
@@ -64,7 +63,7 @@ class ProductFactory(BaseFactory):
     brand = factory.Iterator(Brand.objects.all())
     stock = factory.Faker('pyint', min_value=0, max_value=250)
     rating = factory.Faker('pyfloat', min_value=0.0, max_value=5.0, right_digits=2)
-    ratings_count = factory.Faker('pyint', min_value=0, max_value=900)
+    rating_count = factory.Faker('pyint', min_value=0, max_value=900)
     sales_count = factory.Faker('pyint', min_value=0, max_value=1000)
     category = factory.Iterator(Category.objects.all())
 
@@ -76,10 +75,10 @@ class PurchaseFactory(BaseFactory):
     total_price = factory.Faker('pyint', min_value=250, max_value=9000)
 
 class PurchaseItemFactory(BaseFactory):
-    class meta:
+    class Meta:
         model = PurchaseItem
 
-    purchase = factory.Iterator(Purchase.objects.all())
+    purchase = factory.SubFactory(PurchaseFactory)
     product = factory.Iterator(Product.objects.all())
     product_name = factory.LazyAttribute(lambda obj: obj.product.title)
     quantity = factory.Faker('pyint', min_value=1, max_value=5)

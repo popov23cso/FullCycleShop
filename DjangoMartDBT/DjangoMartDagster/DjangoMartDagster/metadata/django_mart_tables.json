@@ -1,0 +1,20 @@
+{
+    "get_purchases": {
+        "last_ingestion_dtt": "2025-10-06 173500"
+    },
+    "get_purchase_items": {
+        "last_ingestion_dtt": "2025-10-06 172038"
+    },
+    "get_products": {
+        "last_ingestion_dtt": "2025-10-06 090020"
+    },
+    "get_users": {
+        "last_ingestion_dtt": "2025-10-06 090020"
+    },
+    "get_categories": {
+        "last_ingestion_dtt": "2025-10-06 120707"
+    },
+    "get_reviews": {
+        "last_ingestion_dtt": "2025-10-06 090020"
+    }
+}

@@ -1,0 +1,19 @@
+from dagster import Definitions
+from dagster_dbt import DbtCliResource
+from .assets import (DjangoMartDBT_dbt_assets, get_purchases, batch_datetime_resource,
+                     get_purchase_items, get_products, get_users, get_categories,
+                     get_reviews)
+from .project import DjangoMartDBT_project
+from .schedules import daily_djangomart_schedule
+from .jobs import export_models_for_reporting, djangomart_ingestion_job
+
+defs = Definitions(
+    assets=[DjangoMartDBT_dbt_assets, get_purchases, get_purchase_items,
+            get_products, get_users, get_categories, get_reviews],
+    resources={
+        'dbt': DbtCliResource(project_dir=DjangoMartDBT_project),
+        'batch_datetime_resource': batch_datetime_resource
+    },
+    schedules=[daily_djangomart_schedule],
+    jobs=[export_models_for_reporting, djangomart_ingestion_job]
+)
