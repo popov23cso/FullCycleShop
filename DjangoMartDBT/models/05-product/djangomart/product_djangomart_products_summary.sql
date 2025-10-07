@@ -1,0 +1,12 @@
+SELECT
+    ID,
+    TITLE,
+    PRICE,
+    SALES_COUNT,
+    RATING AS AVERAGE_RATING,
+    RATING_COUNT,
+    STOCK AS AVAILABLE_STOCK,
+    UPDATED_DATE,
+    IS_ACTIVE
+FROM {{ ref('scd2_djangomart_products') }}
+WHERE DWH_IS_LATEST = 1

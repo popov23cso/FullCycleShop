@@ -1,0 +1,20 @@
+
+version: 2
+
+generated_month: &generated_month
+  name: GENERATED_MONTH
+  description: "Year and month in which the record was generated."
+
+models:
+  - name: cube_djangomart_purchase_summary
+    description: Summarized purchase data by month
+    columns:
+      - *generated_month
+      - name: TOTAL_TOKENS_SPENT
+        description: "Total tokens that have been spent on the platform for the month"
+      - name: PREVIOUS_MONTH_TOKENS_SPENT
+        description: "Total tokens that have been spent on the platform for the previuos month"
+      - name: TOKENS_SPENT_PERCENTAGE_CHANGE
+        description: |
+          Percentage change of tokens spent on the platform
+          between curent and past mont
