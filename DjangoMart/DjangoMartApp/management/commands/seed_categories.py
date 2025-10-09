@@ -1,5 +1,5 @@
 from .base_command_class import BaseSeedCommand
-from ...factories import CategoryFactory
+from ...factories.factories import CategoryFactory
 
 class Command(BaseSeedCommand):
     help = "Seed Category objects"

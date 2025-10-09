@@ -54,6 +54,7 @@ def get_djangomart_data(access_token, refresh_token, endpoint, updated_after):
     }
 
     all_data = []
+    initial = True
 
     while full_url is not None:    
         headers = {
@@ -61,7 +62,12 @@ def get_djangomart_data(access_token, refresh_token, endpoint, updated_after):
         }
 
         try:
-            response = requests.get(full_url, headers=headers, params=params)
+            if initial:
+                response = requests.get(full_url, headers=headers, params=params)
+                initial = False
+            else:
+                response = requests.get(full_url, headers=headers)
+
             
             if response.status_code == 401:
                 try: 
