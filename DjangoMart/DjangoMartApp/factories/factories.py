@@ -16,7 +16,7 @@ class BaseFactory(factory.django.DjangoModelFactory):
 
     # define the common columns that are present accross all models
     generated_date = factory.LazyFunction(lambda: get_weighted_date())
-    
+
     is_auto_generated = True
 
 class UserFactory(BaseFactory):
@@ -71,15 +71,22 @@ class PurchaseFactory(BaseFactory):
     user = factory.Iterator(User.objects.all())
     total_price = factory.Faker('pyint', min_value=250, max_value=9000)
 
+
 class PurchaseItemFactory(BaseFactory):
     class Meta:
         model = PurchaseItem
 
-    purchase = factory.SubFactory(PurchaseFactory)
     product = factory.Iterator(Product.objects.all())
     product_name = factory.LazyAttribute(lambda obj: obj.product.title)
     quantity = factory.Faker('pyint', min_value=1, max_value=5)
     price_at_purchase = factory.LazyAttribute(lambda obj: obj.quantity * obj.product.price)
+    purchase = factory.SubFactory(PurchaseFactory)
+
+    @factory.post_generation
+    def set_purchase_total(obj, create, extracted, **kwargs):
+        # override total generated in purchase
+        obj.purchase.total_price = obj.price_at_purchase
+        obj.purchase.save()
 
 class ReviewFactory(BaseFactory):
     class Meta:

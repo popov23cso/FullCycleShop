@@ -1,20 +1,20 @@
 {
     "get_purchases": {
-        "last_ingestion_dtt": "2025-10-09 165257"
+        "last_ingestion_dtt": "2025-10-09 174423"
     },
     "get_purchase_items": {
-        "last_ingestion_dtt": "2025-10-09 165745"
+        "last_ingestion_dtt": "2025-10-09 174423"
     },
     "get_products": {
-        "last_ingestion_dtt": "2025-10-09 165257"
+        "last_ingestion_dtt": "2025-10-09 174423"
     },
     "get_users": {
-        "last_ingestion_dtt": "2025-10-09 165257"
+        "last_ingestion_dtt": "2025-10-09 174423"
     },
     "get_categories": {
-        "last_ingestion_dtt": "2025-10-09 165257"
+        "last_ingestion_dtt": "2025-10-09 174423"
     },
     "get_reviews": {
-        "last_ingestion_dtt": "2025-10-09 165257"
+        "last_ingestion_dtt": "2025-10-09 174423"
     }
 }
