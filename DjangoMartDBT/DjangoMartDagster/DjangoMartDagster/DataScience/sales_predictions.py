@@ -1,6 +1,7 @@
 import duckdb
 import tensorflow as tf
 from tensorflow import keras
+from tensorflow.keras import layers
 from pathlib import Path 
 from dagster import op
 from sklearn.preprocessing import StandardScaler
@@ -39,30 +40,41 @@ training_data_y = training_data[Y_columns]
 testing_data_x = testing_data[X_columns]
 testing_data_y = testing_data[Y_columns]
 
+# normalize feature values. mean values of 0 with standart 
+# deviation of 1. makes data more consistent, predictable and balanced
 scaler = StandardScaler()
-
 training_data_x_scaled = scaler.fit_transform(training_data_x)
-testing_data_x_scaled = scaler.fit_transform(testing_data_x)
+
+# apply scaling derived from training data to testing data
+# ensures training and testing data is treated the same
+testing_data_x_scaled = scaler.transform(testing_data_x)
 
 # build tensorflow model
-
 model = keras.Sequential([
-    keras.layers.Dense(64, activation='relu', input_shape=[training_data_x.shape[1]]),
-    keras.layers.Dense(32, activation='relu'),
-    keras.layers.Dense(1) # output will be predicted sales
+    keras.Input(shape=(training_data_x.shape[1],)),
+    layers.Dense(128, activation='relu'),
+    layers.Dense(64, activation='relu'),
+    layers.Dense(32, activation='relu'),
+    layers.Dense(1) # output will be predicted sales
 ])
 
+# track mean absolute error. tells on average how far off predictions are 
 model.compile(optimizer='adam', loss='mse', metrics=['mae'])
 
 model.fit(
     training_data_x_scaled, training_data_y,
     validation_data=(testing_data_x_scaled, testing_data_y),
-    epochs=50,
-    batch_size=16
+    epochs=100,
+    batch_size=32
 )
 
 test_loss, test_mae = model.evaluate(testing_data_x_scaled, testing_data_y, verbose=1)
+
+# mean squared error
 print(f"Test Loss (MSE): {test_loss:.2f}")
+
+# mean absolute error - average absolute difference betwee
+# predicted and actual values
 print(f"Test MAE: {test_mae:.2f}")
 
 
