@@ -1,9 +1,24 @@
 body {
-    background-color:rgb(21, 32, 43);
-    color: white;
+    background-color:#1E1E1E;
+    color: #43D677;
 }
 
-#dark-element {
-    border-color: rgb(21, 32, 43) !important;
-    color: rgb(21, 32, 43) !important;
+.navbar, .button, .navbar-brand,
+.nav-link, .dropdown-item, .nav-item,
+.dropdown, .dropdown-menu, .offcanvas-title,
+.offcanvas, .card, .card-title,
+.card-text  {
+    background-color:#3B3C3E !important;
+    color: #43D677 !important;
+}
+
+a {
+  color: #43D677;
+  text-decoration: underline;
+  text-decoration-color: #43D677; 
+}
+
+a:hover {
+  color: #5DFB9B;
+  text-decoration-color: #5DFB9B; 
 }

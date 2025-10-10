@@ -5,7 +5,7 @@ from .assets import (DjangoMartDBT_dbt_assets, get_purchases, batch_datetime_res
                      get_reviews)
 from .project import DjangoMartDBT_project
 from .schedules import daily_djangomart_schedule
-from .jobs import export_models_for_reporting, djangomart_ingestion_job
+from .jobs import export_models_for_reporting, djangomart_ingestion_job, build_sales_sequential_predictive_model
 
 defs = Definitions(
     assets=[DjangoMartDBT_dbt_assets, get_purchases, get_purchase_items,
@@ -15,5 +15,6 @@ defs = Definitions(
         'batch_datetime_resource': batch_datetime_resource
     },
     schedules=[daily_djangomart_schedule],
-    jobs=[export_models_for_reporting, djangomart_ingestion_job]
+    jobs=[export_models_for_reporting, djangomart_ingestion_job,
+          build_sales_sequential_predictive_model]
 )
