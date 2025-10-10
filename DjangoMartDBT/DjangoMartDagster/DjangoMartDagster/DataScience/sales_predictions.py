@@ -39,7 +39,8 @@ testing_data = daily_sales_df.iloc[split_size:]
 
 X_columns = ['TOTAL_TRANSACTIONS_COUNT', 'DAY_SIN', 'DAY_COS',
              'IS_WEEKEND', 'LAST_DAY_SALES', 'LAST_7_DAYS_SALES',
-             'MONTH_SIN', 'MONTH_COS']
+             'MONTH_SIN', 'MONTH_COS', 'LAST_14_DAYS_SALES',
+             'LAST_30_DAYS_SALES']
 Y_columns = ['TOTAL_TOKENS_SPENT']
 
 training_data_x = training_data[X_columns]
@@ -50,7 +51,8 @@ testing_data_y = testing_data[Y_columns]
 
 # normalize feature values. mean values of 0 with standart 
 # deviation of 1. makes data more consistent, predictable and balanced
-numeric_cols = ['TOTAL_TRANSACTIONS_COUNT', 'LAST_DAY_SALES', 'LAST_7_DAYS_SALES']
+numeric_cols = ['TOTAL_TRANSACTIONS_COUNT', 'LAST_DAY_SALES', 'LAST_7_DAYS_SALES',
+                'LAST_14_DAYS_SALES', 'LAST_30_DAYS_SALES']
 
 scaler = StandardScaler()
 
@@ -77,7 +79,7 @@ model.compile(optimizer='adam', loss='mse', metrics=['mae'])
 model.fit(
     training_data_x_scaled, training_data_y,
     validation_data=(testing_data_x_scaled, testing_data_y),
-    epochs=250,
+    epochs=500,
     batch_size=32
 )
 
