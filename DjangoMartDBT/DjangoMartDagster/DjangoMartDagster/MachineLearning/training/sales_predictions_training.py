@@ -3,7 +3,7 @@ from tensorflow import keras
 from tensorflow.keras import layers
 from pathlib import Path 
 from dagster import op
-from .utility import split_and_encode_sales_data, scale_sales_data
+from .utility import encode_and_split_sales_data, scale_sales_data
 
 @op
 def train_sales_sequential_prediction_model(context):
@@ -11,19 +11,18 @@ def train_sales_sequential_prediction_model(context):
     duckdb_database_name = 'duckdb_database.db'
     duckdb_database_path = Path(current_dir.parents[0] / duckdb_database_name)
 
-    con = duckdb.connect(duckdb_database_path)
+    with duckdb.connect(duckdb_database_path) as con:
+        daily_sales_data_table = 'main_modeled.djangomart_purchase_summary_daily'
+        daily_sales_data_query = f"""
+        SELECT
+            *
+        FROM {daily_sales_data_table}
+        WHERE RECORD_YEAR IN (2024, 2025)
+        """
 
-    daily_sales_data_table = 'main_modeled.djangomart_purchase_summary_daily'
-    daily_sales_data_query = f"""
-    SELECT
-        *
-    FROM {daily_sales_data_table}
-    WHERE RECORD_YEAR IN (2024, 2025)
-    """
+        daily_sales_df = con.execute(daily_sales_data_query).fetch_df()
 
-    daily_sales_df = con.execute(daily_sales_data_query).fetch_df()
-
-    training_data_x, training_data_y, testing_data_x, testing_data_y = split_and_encode_sales_data(daily_sales_df)
+    training_data_x, training_data_y, testing_data_x, testing_data_y = encode_and_split_sales_data(daily_sales_df)
 
     training_data_x_scaled, testing_data_x_scaled = scale_sales_data(training_data_x, testing_data_x)
 
@@ -57,8 +56,8 @@ def train_sales_sequential_prediction_model(context):
     # predicted and actual values
     context.log.info(f'Test MAE: {test_mae:.2f}')
 
-    model_name = 'daily_sales_model.keras'
-    model_path = Path(current_dir / 'DjangoMartDagster' / 'DataScience' / model_name)
+    model_name = 'daily_sales_sequential_model.keras'
+    model_path = Path(current_dir / 'DjangoMartDagster' / 'MachineLearning' / 'models' / model_name)
     model.save(model_path)
 
     context.log.info(f'Model Saved to: {model_path}')
