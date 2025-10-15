@@ -53,4 +53,4 @@ def scale_sales_data(training_data_x, testing_data_x):
     testing_data_x_scaled = testing_data_x
     testing_data_x_scaled[numeric_cols] = scaler.transform(testing_data_x[numeric_cols])
 
-    return training_data_x_scaled, testing_data_x_scaled
+    return training_data_x_scaled, testing_data_x_scaled, scaler

@@ -3,34 +3,15 @@ import pandas as pd
 from pathlib import Path
 from tensorflow import keras
 from datetime import timedelta
-
+from joblib import load
 import numpy as np
+from ..training.utility import encode_sales_data
 
-def encode_sales_data(sales_df):
-    # day of week (0-6) and, circular values, tend to confuse models
-    # encoding them helps model interpret them better
-    sales_df['DAY_SIN'] = np.sin(2 * np.pi * sales_df['DAY_OF_THE_WEEK'] / 7)
-    sales_df['DAY_COS'] = np.cos(2 * np.pi * sales_df['DAY_OF_THE_WEEK'] / 7)
-
-    sales_df['MONTH_SIN'] = np.sin(2 * np.pi * (sales_df['RECORD_MONTH']-1) / 12)
-    sales_df['MONTH_COS'] = np.cos(2 * np.pi * (sales_df['RECORD_MONTH']-1) / 12)
-
-    X_columns = ['TOTAL_TRANSACTIONS_COUNT', 'DAY_SIN', 'DAY_COS',
-                'IS_WEEKEND', 'LAST_DAY_SALES', 'LAST_7_DAYS_SALES',
-                'MONTH_SIN', 'MONTH_COS', 'LAST_14_DAYS_SALES',
-                'LAST_30_DAYS_SALES']
-    Y_columns = ['TOTAL_TOKENS_SPENT']
-
-    sales_df_x = sales_df[X_columns]
-    sales_df_y = sales_df[Y_columns]
-
-    return sales_df_x, sales_df_y
-
-def infer_sales_with_model(model_name):
+def infer_sales_with_model(model_name, scaler_name):
 
     current_dir = Path.cwd()
     duckdb_database_name = 'duckdb_database.db'
-    duckdb_database_path = Path(current_dir.parents[3] / duckdb_database_name)
+    duckdb_database_path = Path(current_dir.parents[0] / duckdb_database_name)
 
     with duckdb.connect(duckdb_database_path) as con:
         daily_sales_data_table = 'main_modeled.djangomart_purchase_summary_daily'
@@ -39,21 +20,57 @@ def infer_sales_with_model(model_name):
             *
         FROM {daily_sales_data_table}
         ORDER BY GENERATED_DAY DESC
-        LIMIT 14
+        LIMIT 30
         """ 
 
-        last_two_weeks_data = con.execute(daily_sales_data_query).fetch_df()
+        last_month_sales_data = con.execute(daily_sales_data_query).fetch_df()
 
-    model_path = Path(current_dir.parents[0] / 'models' / model_name)
+    model_path = Path(current_dir / 'DjangoMartDagster' / 'MachineLearning' /'models' / model_name)
     model = keras.models.load_model(model_path)
 
-    predicted_rows = pd.DataFrame()
-    last_total
-    for i, row in last_two_weeks_data.iterrows():
-        next_day_row = row.copy()
-        next_day_row['GENERATED_DAY'] = row['GENERATED_DAY'] + timedelta(days=1)
-        next_day_row['LAST_7_DAYS_SALES'] = row['LAST_7_DAYS_SALES'] + row['TOTAL_TOKENS_SPENT']
-        next_day_row['LAST_14_DAYS_SALES'] = row['LAST_14_DAYS_SALES'] + row['TOTAL_TOKENS_SPENT']
-        next_day_row['LAST_30_DAYS_SALES'] = row['LAST_30_DAYS_SALES'] + row['TOTAL_TOKENS_SPENT']
+    scaler_path = Path(current_dir / 'DjangoMartDagster' / 'MachineLearning' /'scalers' / scaler_name)
+    scaler = load(scaler_path)
 
-infer_sales_with_model('daily_sales_sequential_model.keras')
+    predicted_rows = pd.DataFrame()
+    day_index_30 = 29
+    day_index_14 = 13
+    day_index_7 = 6
+    last_total_tokens_spent = last_month_sales_data.iloc[0]['TOTAL_TOKENS_SPENT']
+    last_date = last_month_sales_data.iloc[0]['GENERATED_DAY']
+    numeric_cols = ['TOTAL_TRANSACTIONS_COUNT', 'LAST_DAY_SALES', 'LAST_7_DAYS_SALES',
+                    'LAST_14_DAYS_SALES', 'LAST_30_DAYS_SALES']
+
+    for i in last_month_sales_data.tail(7).index:
+        row = last_month_sales_data.loc[[i]] 
+        next_day_row =  last_month_sales_data.loc[[i]] 
+
+        next_date = last_date + timedelta(days=1)
+        day_of_week = next_date.isoweekday()  
+        record_month = next_date.month   
+
+        # set the fields for the next day that total tokens spent will be estimated for
+        next_day_row['DAY_OF_THE_WEEK'] = day_of_week
+        next_day_row['IS_WEEKEND'] = 1 if day_of_week in (6, 7) else 0
+        next_day_row['RECORD_MONTH'] = record_month
+        next_day_row['LAST_7_DAYS_SALES'] = row['LAST_7_DAYS_SALES'] + last_total_tokens_spent - last_month_sales_data.iloc[day_index_7]['TOTAL_TOKENS_SPENT']
+        next_day_row['LAST_14_DAYS_SALES'] = row['LAST_14_DAYS_SALES'] + last_total_tokens_spent - last_month_sales_data.iloc[day_index_14]['TOTAL_TOKENS_SPENT']
+        next_day_row['LAST_30_DAYS_SALES'] = row['LAST_30_DAYS_SALES'] + last_total_tokens_spent - last_month_sales_data.iloc[day_index_30]['TOTAL_TOKENS_SPENT']
+        
+        encoded_data, _ = encode_sales_data(next_day_row)
+
+        encoded_data[numeric_cols] = scaler.transform(encoded_data[numeric_cols])
+
+        predicted_total_tokens_spent = model.predict(encoded_data)
+        predicted_total_tokens_spent = predicted_total_tokens_spent.item()
+
+        day_index_30 -= 1
+        day_index_14 -= 1
+        day_index_7 -= 1
+        last_total_tokens_spent = predicted_total_tokens_spent
+        last_date = next_date
+
+        predicted_row = pd.DataFrame()
+        predicted_row['GENERATED_DAY'] = next_date
+        predicted_row['TOTAL_TOKENS_SPENT'] = predicted_total_tokens_spent
+
+        predicted_rows = pd.concat([predicted_rows, predicted_row], ignore_index=True)

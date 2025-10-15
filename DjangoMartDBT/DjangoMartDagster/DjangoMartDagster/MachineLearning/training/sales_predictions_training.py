@@ -4,6 +4,7 @@ from tensorflow.keras import layers
 from pathlib import Path 
 from dagster import op
 from .utility import encode_and_split_sales_data, scale_sales_data
+from joblib import dump
 
 @op
 def train_sales_sequential_prediction_model(context):
@@ -24,7 +25,7 @@ def train_sales_sequential_prediction_model(context):
 
     training_data_x, training_data_y, testing_data_x, testing_data_y = encode_and_split_sales_data(daily_sales_df)
 
-    training_data_x_scaled, testing_data_x_scaled = scale_sales_data(training_data_x, testing_data_x)
+    training_data_x_scaled, testing_data_x_scaled, scaler = scale_sales_data(training_data_x, testing_data_x)
 
     # build tensorflow model
     model = keras.Sequential([
@@ -59,5 +60,10 @@ def train_sales_sequential_prediction_model(context):
     model_name = 'daily_sales_sequential_model.keras'
     model_path = Path(current_dir / 'DjangoMartDagster' / 'MachineLearning' / 'models' / model_name)
     model.save(model_path)
+
+    scaler_name = 'daily_sales_sequential_scaler.pkl'
+    scaler_path = Path(current_dir / 'DjangoMartDagster' / 'MachineLearning' / 'scalers' / scaler_name)
+    dump(scaler, scaler_path)
+
 
     context.log.info(f'Model Saved to: {model_path}')

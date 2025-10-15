@@ -3,10 +3,11 @@ from dagster_dbt import DbtCliResource, dbt_assets
 
 from .project import DjangoMartDBT_project
 from .ingestion_functions import ingest_djangomart_data
+from .MachineLearning.inference.sales_inferance import infer_sales_with_model
 
 import datetime
 
-DJANGOMART_ASSET_METADATA = {
+DJANGOMART_API_ASSET_METADATA = {
     'api': 'djangomart',
     'owner': 'djangomart data platform_team',
     'delta_metadata_file_name': 'django_mart_tables.json'
@@ -24,7 +25,7 @@ def batch_datetime_resource(_):
         required_resource_keys={'batch_datetime_resource'},
         group_name='djangomart_api_objects',
         description='Fetches djangomart purchase data and saves it to a parquet file in the data lake',
-        metadata=DJANGOMART_ASSET_METADATA
+        metadata=DJANGOMART_API_ASSET_METADATA
         )
 def get_purchases(context):
     endpoint_name = 'get_purchases'
@@ -34,7 +35,7 @@ def get_purchases(context):
         required_resource_keys={'batch_datetime_resource'},
         group_name='djangomart_api_objects',
         description='Fetches djangomart purchase items data and saves it to a parquet file in the data lake',
-        metadata=DJANGOMART_ASSET_METADATA
+        metadata=DJANGOMART_API_ASSET_METADATA
         )
 def get_purchase_items(context):
     endpoint_name = 'get_purchase_items'
@@ -44,7 +45,7 @@ def get_purchase_items(context):
         required_resource_keys={'batch_datetime_resource'},
         group_name='djangomart_api_objects',
         description='Fetches djangomart product data and saves it to a parquet file in the data lake',
-        metadata=DJANGOMART_ASSET_METADATA
+        metadata=DJANGOMART_API_ASSET_METADATA
         )
 def get_products(context):
     endpoint_name = 'get_products'
@@ -54,7 +55,7 @@ def get_products(context):
         required_resource_keys={'batch_datetime_resource'},
         group_name='djangomart_api_objects',
         description='Fetches djangomart user data and saves it to a parquet file in the data lake',
-        metadata=DJANGOMART_ASSET_METADATA
+        metadata=DJANGOMART_API_ASSET_METADATA
         )
 def get_users(context):
     endpoint_name = 'get_users'
@@ -64,7 +65,7 @@ def get_users(context):
         required_resource_keys={'batch_datetime_resource'},
         group_name='djangomart_api_objects',
         description='Fetches djangomart category data and saves it to a parquet file in the data lake',
-        metadata=DJANGOMART_ASSET_METADATA
+        metadata=DJANGOMART_API_ASSET_METADATA
         )
 def get_categories(context):
     endpoint_name = 'get_categories'
@@ -74,11 +75,20 @@ def get_categories(context):
         required_resource_keys={'batch_datetime_resource'},
         group_name='djangomart_api_objects',
         description='Fetches djangomart review data and saves it to a parquet file in the data lake',
-        metadata=DJANGOMART_ASSET_METADATA
+        metadata=DJANGOMART_API_ASSET_METADATA
         )
 def get_reviews(context):
     endpoint_name = 'get_reviews'
     return ingest_djangomart_data(endpoint_name, context.resources.batch_datetime_resource, context.log)
+
+@asset(
+        group_name='djangomart_predictive_models',
+        description='Predicts next 7 day sales based on a sequential ML model'
+        )
+def predict_next_week_sales(context):
+    model_name = 'daily_sales_sequential_model.keras'
+    scaler_name = 'daily_sales_sequential_scaler.pkl'
+    return infer_sales_with_model(model_name, scaler_name)
 
 
     
