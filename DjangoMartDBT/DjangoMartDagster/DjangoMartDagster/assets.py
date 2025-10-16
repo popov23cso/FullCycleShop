@@ -2,7 +2,7 @@ from dagster import AssetExecutionContext, resource, asset
 from dagster_dbt import DbtCliResource, dbt_assets
 
 from .project import DjangoMartDBT_project
-from .ingestion_functions import ingest_djangomart_data
+from .DataIngestion.ingestion_functions import ingest_djangomart_data
 from .MachineLearning.inference.sales_inferance import infer_sales_with_model
 
 import datetime
@@ -85,7 +85,7 @@ def get_reviews(context):
         group_name='djangomart_predictive_models',
         description='Predicts next 7 day sales based on a sequential ML model'
         )
-def predict_next_week_sales(context):
+def predicted_next_week_sales(context):
     model_name = 'daily_sales_sequential_model.keras'
     scaler_name = 'daily_sales_sequential_scaler.pkl'
     return infer_sales_with_model(model_name, scaler_name)

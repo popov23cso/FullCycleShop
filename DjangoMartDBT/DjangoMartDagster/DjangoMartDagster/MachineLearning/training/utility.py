@@ -1,6 +1,9 @@
 from sklearn.preprocessing import StandardScaler
 import numpy as np
 
+NUMERIC_SALES_COLUMNS = ['TOTAL_TRANSACTIONS_COUNT', 'LAST_DAY_SALES', 'LAST_7_DAYS_SALES',
+                    'LAST_14_DAYS_SALES', 'LAST_30_DAYS_SALES']
+
 def encode_sales_data(sales_df):
     # day of week (0-6) and, circular values, tend to confuse models
     # encoding them helps model interpret them better
@@ -16,8 +19,8 @@ def encode_sales_data(sales_df):
                 'LAST_30_DAYS_SALES']
     Y_columns = ['TOTAL_TOKENS_SPENT']
 
-    sales_df_x = sales_df[X_columns]
-    sales_df_y = sales_df[Y_columns]
+    sales_df_x = sales_df[X_columns].copy()
+    sales_df_y = sales_df[Y_columns].copy()
 
     return sales_df_x, sales_df_y
 
@@ -36,21 +39,14 @@ def encode_and_split_sales_data(sales_df):
 
     return training_data_x, training_data_y, testing_data_x, testing_data_y
 
-def scale_sales_data(training_data_x, testing_data_x):
-
-    # normalize feature values. mean values of 0 with standart 
-    # deviation of 1. makes data more consistent, predictable and balanced
-    numeric_cols = ['TOTAL_TRANSACTIONS_COUNT', 'LAST_DAY_SALES', 'LAST_7_DAYS_SALES',
-                    'LAST_14_DAYS_SALES', 'LAST_30_DAYS_SALES']
-
+# normalize feature values. mean values of 0 with standart 
+# deviation of 1. makes data more consistent, predictable and balanced
+def fit_sales_scaler(x_data):
     scaler = StandardScaler()
+    scaler.fit(x_data[NUMERIC_SALES_COLUMNS])
+    return scaler 
 
-    training_data_x_scaled = training_data_x
-    training_data_x_scaled[numeric_cols] = scaler.fit_transform(training_data_x[numeric_cols])
-
-    # apply scaling derived from training data to testing data
-    # ensures training and testing data is treated the same
-    testing_data_x_scaled = testing_data_x
-    testing_data_x_scaled[numeric_cols] = scaler.transform(testing_data_x[numeric_cols])
-
-    return training_data_x_scaled, testing_data_x_scaled, scaler
+# scale passed x data using an already fitted scaler
+def scale_sales_data(x_data, scaler):
+    x_data[NUMERIC_SALES_COLUMNS] = scaler.transform(x_data[NUMERIC_SALES_COLUMNS])
+    return x_data
