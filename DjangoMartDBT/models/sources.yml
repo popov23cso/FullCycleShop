@@ -37,3 +37,10 @@ sources:
         meta:
           dagster:
             asset_key: ['get_reviews']
+  - name: predicted_next_week_sales
+    schema: main_inferred
+    tables:
+      - name: inferred_djangomart_purchase_summary_daily
+        meta:
+          dagster:
+            asset_key: ['predicted_next_week_sales']
