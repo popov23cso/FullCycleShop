@@ -1,5 +1,8 @@
 from sklearn.preprocessing import StandardScaler
 import numpy as np
+from joblib import dump, load
+from pathlib import Path 
+from tensorflow import keras
 
 NUMERIC_SALES_COLUMNS = ['TOTAL_TRANSACTIONS_COUNT', 'LAST_DAY_SALES', 'LAST_7_DAYS_SALES',
                     'LAST_14_DAYS_SALES', 'LAST_30_DAYS_SALES']
@@ -50,3 +53,23 @@ def fit_sales_scaler(x_data):
 def scale_sales_data(x_data, scaler):
     x_data[NUMERIC_SALES_COLUMNS] = scaler.transform(x_data[NUMERIC_SALES_COLUMNS])
     return x_data
+
+def save_model_and_scaler(model_name, model, scaler_name, scaler, dagster_context):
+    current_dir = Path.cwd()
+    model_path = Path(current_dir / 'DjangoMartDagster' / 'MachineLearning' / 'models' / model_name)
+    scaler_path = Path(current_dir / 'DjangoMartDagster' / 'MachineLearning' / 'scalers' / scaler_name)
+
+    model.save(model_path)
+    dump(scaler, scaler_path)
+
+    dagster_context.log.info(f'Model saved to: {model_path}')
+    dagster_context.log.info(f'Scaler saved to: {scaler_path}')
+
+def retreive_model_and_scaler(model_name, scaler_name):
+    current_dir = Path.cwd()
+    model_path = Path(current_dir / 'DjangoMartDagster' / 'MachineLearning' /'models' / model_name)
+    model = keras.models.load_model(model_path)
+    scaler_path = Path(current_dir / 'DjangoMartDagster' / 'MachineLearning' /'scalers' / scaler_name)
+    scaler = load(scaler_path)
+
+    return model, scaler

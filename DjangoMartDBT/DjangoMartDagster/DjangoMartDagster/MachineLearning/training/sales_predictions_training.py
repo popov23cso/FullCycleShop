@@ -3,14 +3,15 @@ from tensorflow import keras
 from tensorflow.keras import layers
 from pathlib import Path 
 from dagster import op
-from .utility import encode_and_split_sales_data, fit_sales_scaler, scale_sales_data
+from ..utility import (encode_and_split_sales_data, fit_sales_scaler, scale_sales_data,
+                      save_model_and_scaler)
 from joblib import dump
+from ...common_constants import DBT_DUCKDB_DATABASE_NAME
 
 @op
 def train_sales_sequential_prediction_model(context):
     current_dir = Path.cwd()
-    duckdb_database_name = 'duckdb_database.db'
-    duckdb_database_path = Path(current_dir.parents[0] / duckdb_database_name)
+    duckdb_database_path = Path(current_dir.parents[0] / DBT_DUCKDB_DATABASE_NAME)
 
     with duckdb.connect(duckdb_database_path) as con:
         daily_sales_data_table = 'main_modeled.djangomart_purchase_summary_daily'
@@ -56,17 +57,11 @@ def train_sales_sequential_prediction_model(context):
     # mean squared error
     context.log.info(f'Test Loss (MSE): {test_loss:.2f}')
 
-    # mean absolute error - average absolute difference betwee
+    # mean absolute error - average absolute difference between
     # predicted and actual values
     context.log.info(f'Test MAE: {test_mae:.2f}')
 
     model_name = 'daily_sales_sequential_model.keras'
-    model_path = Path(current_dir / 'DjangoMartDagster' / 'MachineLearning' / 'models' / model_name)
-    model.save(model_path)
-
     scaler_name = 'daily_sales_sequential_scaler.pkl'
-    scaler_path = Path(current_dir / 'DjangoMartDagster' / 'MachineLearning' / 'scalers' / scaler_name)
-    dump(scaler, scaler_path)
-
-
-    context.log.info(f'Model Saved to: {model_path}')
+    
+    save_model_and_scaler(model_name, model, scaler_name, scaler, context)

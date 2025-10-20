@@ -3,13 +3,12 @@ import pandas as pd
 from pathlib import Path
 from tensorflow import keras
 from datetime import timedelta
-from joblib import load
+
 import numpy as np
-from ..training.utility import encode_sales_data, scale_sales_data
+from ..utility import encode_sales_data, scale_sales_data, retreive_model_and_scaler
 from ...common_constants import DBT_DUCKDB_DATABASE_NAME
 
 def infer_sales_with_model(model_name, scaler_name):
-
     current_dir = Path.cwd()
     duckdb_database_path = Path(current_dir.parents[0] / DBT_DUCKDB_DATABASE_NAME)
 
@@ -25,10 +24,7 @@ def infer_sales_with_model(model_name, scaler_name):
 
     last_month_sales_data = con.execute(daily_sales_data_query).fetch_df()
 
-    model_path = Path(current_dir / 'DjangoMartDagster' / 'MachineLearning' /'models' / model_name)
-    model = keras.models.load_model(model_path)
-    scaler_path = Path(current_dir / 'DjangoMartDagster' / 'MachineLearning' /'scalers' / scaler_name)
-    scaler = load(scaler_path)
+    model, scaler = retreive_model_and_scaler(model_name, scaler_name)
 
     predicted_rows = pd.DataFrame()
     day_index_30 = 29
