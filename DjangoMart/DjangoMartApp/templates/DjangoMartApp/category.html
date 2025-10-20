@@ -30,7 +30,7 @@
                 </div>
                 <div>
                     {% if products.has_previous %}
-                        <a class="btn btn-light" href="?page={{ products.previous_page_number }}">Previous</a>
+                        <a class="btn btn-outline-light" href="?page={{ products.previous_page_number }}">Previous</a>
                     {% endif %}
 
                     {% for num in products.paginator.page_range %}
@@ -50,7 +50,7 @@
                     {% endfor %}
 
                     {% if products.has_next %}
-                        <a class="btn btn-light" href="?page={{ products.next_page_number }}">Next</a>
+                        <a class="btn btn-outline-light" href="?page={{ products.next_page_number }}">Next</a>
                     {% endif %}
                 </div>
             </div>

@@ -8,8 +8,8 @@ body {
 .dropdown, .dropdown-menu, .offcanvas-title,
 .offcanvas, .card, .card-title,
 .card-text  {
-    background-color:#3B3C3E !important;
-    color: #43D677 !important;
+  background-color:#3B3C3E !important;
+  color: #43D677 !important;
 }
 
 a {
@@ -21,4 +21,22 @@ a {
 a:hover {
   color: #5DFB9B;
   text-decoration-color: #5DFB9B; 
+}
+
+.btn-outline-light:hover {
+  background-color: #43D677 !important; 
+  color: #fff !important;              
+}
+
+.btn-outline-light:active,
+.btn-outline-light.active {
+  color: #43D677 !important; 
+  border-color: #43D677 !important;
+  background-color: #3B3C3E !important; 
+}
+
+.form-control  {
+  background-color:#3B3C3E !important;
+  color: #43D677 !important;
+  border-color: #43D677 !important;
 }
