@@ -1,5 +1,5 @@
 from .base_command_class import BaseSeedCommand
-from ...factories import ProductFactory
+from ...factories.factories import ProductFactory
 
 class Command(BaseSeedCommand):
     help = "Seed Product objects"

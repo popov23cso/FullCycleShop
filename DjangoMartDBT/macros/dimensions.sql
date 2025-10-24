@@ -3,7 +3,7 @@
 -- (dimensions that do not join with other dimensions)
 -- or in case of snowflake schema, the dimension should first be integrated, according 
 -- to the integration procedure, before being passed to this macro
-{% macro generate_scd2(relation_name, id_column, delta_column='DWH_BATCH_DATETIME') %}
+{% macro generate_scd2(relation_name, id_column, delta_column='DWH_DELTA_DATE') %}
     WITH delta_row_numbers AS 
     (
         SELECT 

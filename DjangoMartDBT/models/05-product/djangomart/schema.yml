@@ -4,17 +4,44 @@ version: 2
 generated_month: &generated_month
   name: GENERATED_MONTH
   description: "Year and month in which the record was generated."
+generated_day: &generated_day
+  name: GENERATED_DAY
+  description: "Year and month and day in which the record was generated."
+total_tokens_spent: &total_tokens_spent
+  name: TOTAL_TOKENS_SPENT
+  description: "Total tokens spent for the time period"
+total_transactions_count: &total_transactions_count
+  name: TOTAL_TRANSACTIONS_COUNT
+  description: "Total transaction count that occured on that time"
 
 models:
-  - name: cube_djangomart_purchase_summary
+  - name: cube_djangomart_purchase_summary_monthly
     description: Summarized purchase data by month
     columns:
       - *generated_month
-      - name: TOTAL_TOKENS_SPENT
-        description: "Total tokens that have been spent on the platform for the month"
+      - *total_tokens_spent
+      - *total_transactions_count
       - name: PREVIOUS_MONTH_TOKENS_SPENT
-        description: "Total tokens that have been spent on the platform for the previuos month"
+        description: "Total tokens spent for the previuos month"
       - name: TOKENS_SPENT_PERCENTAGE_CHANGE
         description: |
           Percentage change of tokens spent on the platform
           between curent and past mont
+  - name: cube_djangomart_purchase_summary_daily
+    description: Summarized purchase data by day
+    columns:
+      - *generated_day
+      - *total_tokens_spent
+      - *total_transactions_count
+      - name: DAY_OF_THE_WEEK
+        description: "Number between 1-7 representing the day of the week (Monday-Sunday)"
+      - name: IS_WEEKEND
+        description: "Flag indicating weather the day is a weekend"
+      - name: LAST_DAY_SALES
+        description: "Total tokens spent on the previous day"
+      - name: LAST_7_DAYS_SALES
+        description: "Total tokens spent on previous 7 days (including the day of the record)"
+      - name: RECORD_MONTH
+        description: "Value between 1-12 showing which for month of the year it is"
+      - name: RECORD_YEAR
+        description: "Year of the record"

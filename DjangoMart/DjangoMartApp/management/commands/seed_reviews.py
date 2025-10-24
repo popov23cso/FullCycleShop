@@ -1,5 +1,5 @@
 from .base_command_class import BaseSeedCommand
-from ...factories import ReviewFactory
+from ...factories.factories import ReviewFactory
 
 class Command(BaseSeedCommand):
     help = "Seed Review objects"
