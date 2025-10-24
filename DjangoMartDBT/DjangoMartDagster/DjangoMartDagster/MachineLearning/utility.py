@@ -3,6 +3,8 @@ import numpy as np
 from joblib import dump, load
 from pathlib import Path 
 from tensorflow import keras
+import duckdb
+from ..common_constants import DBT_DUCKDB_DATABASE_NAME
 
 NUMERIC_SALES_COLUMNS = ['TOTAL_TRANSACTIONS_COUNT', 'LAST_DAY_SALES', 'LAST_7_DAYS_SALES',
                     'LAST_14_DAYS_SALES', 'LAST_30_DAYS_SALES']
@@ -73,3 +75,28 @@ def retreive_model_and_scaler(model_name, scaler_name):
     scaler = load(scaler_path)
 
     return model, scaler
+
+def get_training_daily_sales_data_years(target_years):
+    target_years_sql_string = ','.join(map(str, target_years))
+
+    current_dir = Path.cwd()
+    duckdb_database_path = Path(current_dir.parents[0] / DBT_DUCKDB_DATABASE_NAME)
+    with duckdb.connect(duckdb_database_path) as con:
+        daily_sales_data_table = 'main_modeled.djangomart_purchase_summary_daily'
+        daily_sales_data_query = f"""
+        SELECT
+            *
+        FROM {daily_sales_data_table}
+        WHERE RECORD_YEAR IN ({target_years_sql_string})
+        """
+
+        daily_sales_df = con.execute(daily_sales_data_query).fetch_df()
+
+    return daily_sales_df
+
+def create_time_sequences(x_data, y_data, window_size):
+    x_sequences, y_sequences = [], []
+    for i in range(len(x_data) - window_size):
+        x_sequences.append(x_data[i:(i + window_size)].values)
+        y_sequences.append(y_data.iloc[i + window_size])
+    return np.array(x_sequences), np.array(y_sequences)

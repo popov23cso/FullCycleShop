@@ -1,6 +1,6 @@
 from dagster import define_asset_job, AssetSelection, job
 from .ops import export_models_to_csv
-from .MachineLearning.training.sales_predictions_training import train_sales_sequential_prediction_model
+from .MachineLearning.training.sales_predictions_training import train_sales_sequential_prediction_model, train_sales_LSTM_prediction_model
 
 djnagomart_daily_job = define_asset_job(
                                     name='daily_djangomart_job',
@@ -23,3 +23,7 @@ def export_models_for_reporting():
 @job
 def train_sales_sequential_predictive_model_job():
     train_sales_sequential_prediction_model()
+
+@job
+def train_sales_LSTM_prediction_model_job():
+    train_sales_LSTM_prediction_model()
