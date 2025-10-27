@@ -6,10 +6,40 @@ from tensorflow import keras
 import duckdb
 from ..common_constants import DBT_DUCKDB_DATABASE_NAME
 
-NUMERIC_SALES_COLUMNS = ['TOTAL_TRANSACTIONS_COUNT', 'LAST_DAY_SALES', 'LAST_7_DAYS_SALES',
-                    'LAST_14_DAYS_SALES', 'LAST_30_DAYS_SALES']
+# CONSTANTS
+TRAINING_YEARS = [2024, 2025]
 
-def encode_sales_data(sales_df):
+SEQUENTIAL_MODEL_TYPE = 'sequential_model'
+NUMERIC_SEQUENTIAL_MODEL_SALES_COLUMNS = ['TOTAL_TRANSACTIONS_COUNT', 'LAST_DAY_SALES', 'LAST_7_DAYS_SALES',
+                    'LAST_14_DAYS_SALES', 'LAST_30_DAYS_SALES']
+X_COLUMNS_SEQUENTIAL_MODEL = ['TOTAL_TRANSACTIONS_COUNT', 'DAY_SIN', 'DAY_COS',
+                'IS_WEEKEND', 'LAST_DAY_SALES', 'LAST_7_DAYS_SALES',
+                'MONTH_SIN', 'MONTH_COS', 'LAST_14_DAYS_SALES',
+                'LAST_30_DAYS_SALES']
+Y_COLUMNS_SEQUENTIAL_MODEL = ['TOTAL_TOKENS_SPENT']
+
+LSTM_MODEL_TYPE = 'LSTM_model'
+NUMERIC_LSTM_MODEL_SALES_COLUMNS = ['TOTAL_TRANSACTIONS_COUNT']
+X_COLUMNS_LSTM_MODEL = ['TOTAL_TRANSACTIONS_COUNT', 'DAY_SIN', 'DAY_COS',
+                'IS_WEEKEND', 'LAST_DAY_SALES', 
+                'MONTH_SIN', 'MONTH_COS',]
+Y_COLUMNS_LSTM_MODEL = ['TOTAL_TOKENS_SPENT']
+
+MODEL_COLUMN_MAPPER = {
+    SEQUENTIAL_MODEL_TYPE: {
+        'X_COLUMNS': X_COLUMNS_SEQUENTIAL_MODEL,
+        'Y_COLUMNS': Y_COLUMNS_SEQUENTIAL_MODEL,
+        'NUMERIC_COLUMNS': NUMERIC_SEQUENTIAL_MODEL_SALES_COLUMNS
+    },
+    LSTM_MODEL_TYPE: {
+        'X_COLUMNS': X_COLUMNS_LSTM_MODEL,
+        'Y_COLUMNS': Y_COLUMNS_LSTM_MODEL,
+        'NUMERIC_COLUMNS': NUMERIC_LSTM_MODEL_SALES_COLUMNS
+    }
+}
+
+
+def encode_sales_data(sales_df, model_type):
     # day of week (0-6) and, circular values, tend to confuse models
     # encoding them helps model interpret them better
     sales_df['DAY_SIN'] = np.sin(2 * np.pi * sales_df['DAY_OF_THE_WEEK'] / 7)
@@ -18,20 +48,14 @@ def encode_sales_data(sales_df):
     sales_df['MONTH_SIN'] = np.sin(2 * np.pi * (sales_df['RECORD_MONTH']-1) / 12)
     sales_df['MONTH_COS'] = np.cos(2 * np.pi * (sales_df['RECORD_MONTH']-1) / 12)
 
-    X_columns = ['TOTAL_TRANSACTIONS_COUNT', 'DAY_SIN', 'DAY_COS',
-                'IS_WEEKEND', 'LAST_DAY_SALES', 'LAST_7_DAYS_SALES',
-                'MONTH_SIN', 'MONTH_COS', 'LAST_14_DAYS_SALES',
-                'LAST_30_DAYS_SALES']
-    Y_columns = ['TOTAL_TOKENS_SPENT']
-
-    sales_df_x = sales_df[X_columns].copy()
-    sales_df_y = sales_df[Y_columns].copy()
-
+    sales_df_x = sales_df[MODEL_COLUMN_MAPPER[model_type]['X_COLUMNS']].copy()
+    sales_df_y = sales_df[MODEL_COLUMN_MAPPER[model_type]['Y_COLUMNS']].copy()
+        
     return sales_df_x, sales_df_y
 
-def encode_and_split_sales_data(sales_df):
+def encode_and_split_sales_data(sales_df, model_type):
 
-    sales_df_x, sales_df_y = encode_sales_data(sales_df)
+    sales_df_x, sales_df_y = encode_sales_data(sales_df, model_type)
     # split data into two batches - 80% of all data towards training, 20% towards testing
     # since data is time based no random split is applied
     split_size = int(len(sales_df) * 0.8)
@@ -46,14 +70,14 @@ def encode_and_split_sales_data(sales_df):
 
 # normalize feature values. mean values of 0 with standart 
 # deviation of 1. makes data more consistent, predictable and balanced
-def fit_sales_scaler(x_data):
+def fit_sales_scaler(x_data, model_type):
     scaler = StandardScaler()
-    scaler.fit(x_data[NUMERIC_SALES_COLUMNS])
+    scaler.fit(x_data[MODEL_COLUMN_MAPPER[model_type]['NUMERIC_COLUMNS']])
     return scaler 
 
 # scale passed x data using an already fitted scaler
-def scale_sales_data(x_data, scaler):
-    x_data[NUMERIC_SALES_COLUMNS] = scaler.transform(x_data[NUMERIC_SALES_COLUMNS])
+def scale_sales_data(x_data, scaler, model_type):
+    x_data[MODEL_COLUMN_MAPPER[model_type]['NUMERIC_COLUMNS']] = scaler.transform(x_data[MODEL_COLUMN_MAPPER[model_type]['NUMERIC_COLUMNS']])
     return x_data
 
 def save_model_and_scaler(model_name, model, scaler_name, scaler, dagster_context):
@@ -100,3 +124,19 @@ def create_time_sequences(x_data, y_data, window_size):
         x_sequences.append(x_data[i:(i + window_size)].values)
         y_sequences.append(y_data.iloc[i + window_size])
     return np.array(x_sequences), np.array(y_sequences)
+
+def get_training_and_testing_data(training_years, model_type):
+    daily_sales_df = get_training_daily_sales_data_years(training_years)
+    training_data_x, training_data_y, testing_data_x, testing_data_y = encode_and_split_sales_data(daily_sales_df, model_type)
+
+    scaler = fit_sales_scaler(training_data_x, model_type)
+    training_data_x_scaled = scale_sales_data(training_data_x, scaler, model_type)
+    testing_data_x_scaled = scale_sales_data(testing_data_x, scaler, model_type)
+
+    model_input_data = {}
+    model_input_data['training_x'] = training_data_x_scaled
+    model_input_data['training_y'] = training_data_y
+    model_input_data['testing_x'] = testing_data_x_scaled
+    model_input_data['testing_y'] = testing_data_y
+
+    return model_input_data, scaler
