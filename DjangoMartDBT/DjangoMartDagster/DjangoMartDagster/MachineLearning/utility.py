@@ -5,38 +5,7 @@ from pathlib import Path
 from tensorflow import keras
 import duckdb
 from ..common_constants import DBT_DUCKDB_DATABASE_NAME
-
-# CONSTANTS
-TRAINING_YEARS = [2024, 2025]
-
-SEQUENTIAL_MODEL_TYPE = 'sequential_model'
-NUMERIC_SEQUENTIAL_MODEL_SALES_COLUMNS = ['TOTAL_TRANSACTIONS_COUNT', 'LAST_DAY_SALES', 'LAST_7_DAYS_SALES',
-                    'LAST_14_DAYS_SALES', 'LAST_30_DAYS_SALES']
-X_COLUMNS_SEQUENTIAL_MODEL = ['TOTAL_TRANSACTIONS_COUNT', 'DAY_SIN', 'DAY_COS',
-                'IS_WEEKEND', 'LAST_DAY_SALES', 'LAST_7_DAYS_SALES',
-                'MONTH_SIN', 'MONTH_COS', 'LAST_14_DAYS_SALES',
-                'LAST_30_DAYS_SALES']
-Y_COLUMNS_SEQUENTIAL_MODEL = ['TOTAL_TOKENS_SPENT']
-
-LSTM_MODEL_TYPE = 'LSTM_model'
-NUMERIC_LSTM_MODEL_SALES_COLUMNS = ['TOTAL_TRANSACTIONS_COUNT']
-X_COLUMNS_LSTM_MODEL = ['TOTAL_TRANSACTIONS_COUNT', 'DAY_SIN', 'DAY_COS',
-                'IS_WEEKEND', 'LAST_DAY_SALES', 
-                'MONTH_SIN', 'MONTH_COS',]
-Y_COLUMNS_LSTM_MODEL = ['TOTAL_TOKENS_SPENT']
-
-MODEL_COLUMN_MAPPER = {
-    SEQUENTIAL_MODEL_TYPE: {
-        'X_COLUMNS': X_COLUMNS_SEQUENTIAL_MODEL,
-        'Y_COLUMNS': Y_COLUMNS_SEQUENTIAL_MODEL,
-        'NUMERIC_COLUMNS': NUMERIC_SEQUENTIAL_MODEL_SALES_COLUMNS
-    },
-    LSTM_MODEL_TYPE: {
-        'X_COLUMNS': X_COLUMNS_LSTM_MODEL,
-        'Y_COLUMNS': Y_COLUMNS_LSTM_MODEL,
-        'NUMERIC_COLUMNS': NUMERIC_LSTM_MODEL_SALES_COLUMNS
-    }
-}
+from .sales_constants import MODEL_COLUMN_MAPPER
 
 
 def encode_sales_data(sales_df, model_type):
@@ -140,3 +109,30 @@ def get_training_and_testing_data(training_years, model_type):
     model_input_data['testing_y'] = testing_data_y
 
     return model_input_data, scaler
+
+def sequence_training_and_testing_data(model_input_data, window_size):
+    training_data_x_sequenced, training_data_y_sequenced = create_time_sequences(model_input_data['training_x'],
+                                                                                model_input_data['training_y'],
+                                                                                window_size) 
+    
+    testing_data_x_sequenced, testing_data_y_sequenced = create_time_sequences(model_input_data['testing_x'],
+                                                                                model_input_data['testing_y'],
+                                                                                window_size) 
+    
+    model_input_data['training_x'] = training_data_x_sequenced
+    model_input_data['training_y'] = training_data_y_sequenced
+
+    model_input_data['testing_x'] = testing_data_x_sequenced
+    model_input_data['testing_y'] = testing_data_y_sequenced
+
+    return model_input_data
+
+def log_testing_results(context, model, model_input_data):
+    test_loss, test_mae = model.evaluate(model_input_data['testing_x'], model_input_data['testing_y'], verbose=1)
+
+    # mean squared error
+    context.log.info(f'Test Loss (MSE): {test_loss:.2f}')
+
+    # mean absolute error - average absolute difference between
+    # predicted and actual values
+    context.log.info(f'Test MAE: {test_mae:.2f}')
