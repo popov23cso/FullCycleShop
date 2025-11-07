@@ -1,0 +1,67 @@
+
+version: 2
+
+dwh_is_latest: &dwh_is_latest
+  name: DWH_IS_LATEST
+  description: "Flags the latest version of an item with 1"
+  tests:
+    - not_null:
+        arguments: {}
+        config:
+          severity: error
+dwh_delta_date: &dwh_delta_date
+  name: DWH_DELTA_DATE
+  description: |
+   "Generic delta column, containing the value
+    of the actual delta column of the model"
+  tests:
+    - not_null:
+        arguments: {}
+        config:
+          severity: error
+dwh_sk: &dwh_sk
+  name: DWH_SK
+  description: "Surrogate key unique for each row"
+  tests:
+    - not_null:
+        arguments: {}
+        config:
+          severity: error
+    - unique:
+        arguments: {}
+        config:
+          severity: error
+
+
+models:
+  - name: historic_djangomart_purchases
+    columns:
+      - *dwh_is_latest
+      - *dwh_delta_date
+      - *dwh_sk
+  - name: historic_djangomart_purchase_items
+    columns:
+      - *dwh_is_latest
+      - *dwh_delta_date
+      - *dwh_sk
+  - name: historic_djangomart_products
+    columns:
+      - *dwh_is_latest
+      - *dwh_delta_date
+      - *dwh_sk
+  - name: historic_djangomart_users
+    columns:
+      - *dwh_is_latest
+      - *dwh_delta_date
+      - *dwh_sk
+  - name: historic_djangomart_categories
+    columns:
+      - *dwh_is_latest
+      - *dwh_delta_date
+      - *dwh_sk
+  - name: historic_djangomart_reviews
+    columns:
+      - *dwh_is_latest
+      - *dwh_delta_date
+      - *dwh_sk
+

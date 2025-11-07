@@ -1,0 +1,35 @@
+
+version: 2
+
+dwh_effective_from: &dwh_effective_from
+  name: DWH_EFFECTIVE_FROM
+  description: "Date from which the record became effective"
+  tests:
+    - not_null:
+        arguments: {}
+        config:
+          severity: error
+dwh_effective_to: &dwh_effective_to
+  name: DWH_EFFECTIVE_TO
+  description: "Date at which the record ended being effective"
+  tests:
+    - not_null:
+        arguments: {}
+        config:
+          severity: error
+
+models:
+  - name: scd2_djangomart_products
+    columns:
+      - *dwh_effective_from
+      - *dwh_effective_to
+  - name: scd2_djangomart_users
+    columns:
+      - *dwh_effective_from
+      - *dwh_effective_to
+  - name: scd2_djangomart_categories
+    columns:
+      - *dwh_effective_from
+      - *dwh_effective_to
+
+
